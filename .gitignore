@@ -6,7 +6,7 @@
 *.swp
 .buildlog/
 .history
-
+.vscode/launch.json
 
 
 # Flutter repo-specific
@@ -116,4 +116,32 @@ app.*.symbols
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
-!/dev/ci/**/Gemfile.lock
+!/dev/ci/**/Gemfile.
+
+
+
+
+
+
+# IDE (you are currently tracking these via .idea)
+.idea/
+*.iml
+
+# VS Code local configs (keep repo clean for team)
+.vscode/
+
+# Supabase local CLI state (VERY IMPORTANT)
+supabase/.temp/
+supabase/.branches/
+supabase/.pooler-url
+supabase/.project-ref
+supabase/.linked-project.json
+
+# Environment variables (future-proofing for CI/CD)
+.env
+.env.*
+*.env
+
+# OS junk (optional but clean)
+.DS_Store
+Thumbs.db
