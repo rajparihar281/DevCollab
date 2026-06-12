@@ -8,19 +8,31 @@
         {
             "name": "dev_collab",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "toolArgs": [
+                "--dart-define=SUPABASE_URL=https://mmshnorirrhhraczgutn.supabase.co",
+                "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tc2hub3JpcnJoaHJhY3pndXRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMzcxMzUsImV4cCI6MjA5NjgxMzEzNX0.GzK8JMvjc0KrrOlpoYAI5SnhRn71ChDgpq9jbYTzcZo"
+              ]
         },
         {
-            "name": "dev_collab (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
+          "name": "dev_collab (profile mode)",
+          "request": "launch",
+          "type": "dart",
+          "flutterMode": "profile",
+          "toolArgs": [
+            "--dart-define=SUPABASE_URL=https://mmshnorirrhhraczgutn.supabase.co",
+            "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tc2hub3JpcnJoaHJhY3pndXRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMzcxMzUsImV4cCI6MjA5NjgxMzEzNX0.GzK8JMvjc0KrrOlpoYAI5SnhRn71ChDgpq9jbYTzcZo"
+          ]
         },
         {
-            "name": "dev_collab (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
+          "name": "dev_collab (release mode)",
+          "request": "launch",
+          "type": "dart",
+          "flutterMode": "release",
+          "toolArgs": [
+            "--dart-define=SUPABASE_URL=https://mmshnorirrhhraczgutn.supabase.co",
+            "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1tc2hub3JpcnJoaHJhY3pndXRuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMzcxMzUsImV4cCI6MjA5NjgxMzEzNX0.GzK8JMvjc0KrrOlpoYAI5SnhRn71ChDgpq9jbYTzcZo"
+          ] 
         }
     ]
 }
