@@ -116,6 +116,7 @@ app.*.symbols
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+<<<<<<< HEAD
 !/dev/ci/**/Gemfile.
 
 
@@ -145,3 +146,9 @@ supabase/.linked-project.json
 # OS junk (optional but clean)
 .DS_Store
 Thumbs.db
+=======
+!/dev/ci/**/Gemfile.lock
+
+.idea
+.vscode
+>>>>>>> 6b873a3 (chore: update gitignore to exclude IntelliJ IDEA files)
