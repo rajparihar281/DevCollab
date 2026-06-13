@@ -1,3 +1,4 @@
+import 'package:dev_collab/features/auth/presentation/pages/auth_gate.dart';
 import 'package:flutter/material.dart';
 
 class DevCollabApp extends StatelessWidget {
@@ -9,7 +10,7 @@ class DevCollabApp extends StatelessWidget {
       title: 'DevCollab',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(useMaterial3: true),
-      home: const Scaffold(body: Center(child: Text('DevCollab'))),
+      home: const AuthGate(),
     );
   }
 }
