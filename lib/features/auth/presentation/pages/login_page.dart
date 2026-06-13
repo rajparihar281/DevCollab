@@ -1,9 +1,10 @@
 import 'dart:developer';
 
-import 'package:dev_collab/features/auth/presentation/pages/signup_page.dart';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dev_collab/routing/route_names.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -119,10 +120,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             TextButton(
               onPressed: () {
                 log('[LoginPage] Navigating to SignupPage');
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const SignupPage()),
-                );
+                context.push(RouteNames.signup);
               },
               child: const Text('Create Account'),
             ),
