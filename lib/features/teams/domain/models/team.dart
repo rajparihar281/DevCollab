@@ -1,39 +1,37 @@
-class Organization {
-  const Organization({
+class Team {
+  const Team({
     required this.id,
+    required this.organizationId,
     required this.name,
     this.description,
-    required this.ownerId,
     required this.createdAt,
     required this.updatedAt,
   });
 
   final String id;
+  final String organizationId;
   final String name;
   final String? description;
-  final String ownerId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  factory Organization.fromJson(Map<String, dynamic> json) {
-    return Organization(
+  factory Team.fromJson(Map<String, dynamic> json) {
+    return Team(
       id: json['id'] as String,
+      organizationId: json['organization_id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
-      ownerId: json['owner_id'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'owner_id': ownerId,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'organization_id': organizationId,
+        'name': name,
+        'description': description,
+        'created_at': createdAt.toIso8601String(),
+        'updated_at': updatedAt.toIso8601String(),
+      };
 }
