@@ -6,7 +6,16 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/signup_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
+import '../features/chat/presentation/pages/chat_page.dart';
+import '../features/organizations/presentation/pages/create_organization_page.dart';
+import '../features/organizations/presentation/pages/organization_detail_page.dart';
 import '../features/organizations/presentation/pages/organizations_page.dart';
+import '../features/projects/presentation/pages/create_project_page.dart';
+import '../features/projects/presentation/pages/project_detail_page.dart';
+import '../features/tasks/presentation/pages/create_task_page.dart';
+import '../features/tasks/presentation/pages/task_detail_page.dart';
+import '../features/teams/presentation/pages/create_team_page.dart';
+import '../features/teams/presentation/pages/team_detail_page.dart';
 import 'route_names.dart';
 
 GoRouter createAppRouter(AuthNotifier authNotifier) {
@@ -20,36 +29,21 @@ GoRouter createAppRouter(AuthNotifier authNotifier) {
 
       log('[GoRouter redirect] path=$currentPath, initialized=$isInitialized, hasSession=$hasSession');
 
-      // Still waiting for the first auth event from Supabase — stay on splash.
       if (!isInitialized) {
-        log('[GoRouter redirect] Not initialized → staying on splash');
         return currentPath == RouteNames.splash ? null : RouteNames.splash;
       }
 
-      // Auth pages (splash, login, signup) that an authenticated user
-      // should be redirected away from.
       final isAuthRoute = currentPath == RouteNames.splash ||
           currentPath == RouteNames.login ||
           currentPath == RouteNames.signup;
 
-      if (hasSession && isAuthRoute) {
-        log('[GoRouter redirect] Has session + on auth route → /organizations');
-        return RouteNames.organizations;
-      }
-
-      if (!hasSession && !isAuthRoute) {
-        log('[GoRouter redirect] No session + on protected route → /login');
-        return RouteNames.login;
-      }
-
-      // If we're on splash but initialized with no session, go to login.
+      if (hasSession && isAuthRoute) return RouteNames.organizations;
+      if (!hasSession && !isAuthRoute) return RouteNames.login;
       if (currentPath == RouteNames.splash && !hasSession) {
-        log('[GoRouter redirect] Splash + no session → /login');
         return RouteNames.login;
       }
 
-      log('[GoRouter redirect] No redirect needed');
-      return null; // No redirect needed.
+      return null;
     },
     routes: [
       GoRoute(
@@ -64,9 +58,79 @@ GoRouter createAppRouter(AuthNotifier authNotifier) {
         path: RouteNames.signup,
         builder: (_, _) => const SignupPage(),
       ),
+
+      // Organizations
       GoRoute(
         path: RouteNames.organizations,
         builder: (_, _) => const OrganizationsPage(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            builder: (_, _) => const CreateOrganizationPage(),
+          ),
+          GoRoute(
+            path: ':orgId',
+            builder: (_, state) => OrganizationDetailPage(
+              orgId: state.pathParameters['orgId']!,
+            ),
+            routes: [
+              GoRoute(
+                path: 'teams/create',
+                builder: (_, state) => CreateTeamPage(
+                  orgId: state.pathParameters['orgId']!,
+                ),
+              ),
+              GoRoute(
+                path: 'teams/:teamId',
+                builder: (_, state) => TeamDetailPage(
+                  orgId: state.pathParameters['orgId']!,
+                  teamId: state.pathParameters['teamId']!,
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'chat',
+                    builder: (_, state) => ChatPage(
+                      orgId: state.pathParameters['orgId']!,
+                      teamId: state.pathParameters['teamId']!,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'projects/create',
+                    builder: (_, state) => CreateProjectPage(
+                      orgId: state.pathParameters['orgId']!,
+                      teamId: state.pathParameters['teamId']!,
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'projects/:projectId',
+                    builder: (_, state) => ProjectDetailPage(
+                      orgId: state.pathParameters['orgId']!,
+                      teamId: state.pathParameters['teamId']!,
+                      projectId: state.pathParameters['projectId']!,
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'tasks/create',
+                        builder: (_, state) => CreateTaskPage(
+                          orgId: state.pathParameters['orgId']!,
+                          projectId: state.pathParameters['projectId']!,
+                        ),
+                      ),
+                      GoRoute(
+                        path: 'tasks/:taskId',
+                        builder: (_, state) => TaskDetailPage(
+                          orgId: state.pathParameters['orgId']!,
+                          projectId: state.pathParameters['projectId']!,
+                          taskId: state.pathParameters['taskId']!,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

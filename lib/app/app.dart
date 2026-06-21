@@ -29,6 +29,8 @@ class DevCollabApp extends ConsumerWidget {
       title: 'DevCollab',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.dark,
       routerConfig: router,
     );
   }
