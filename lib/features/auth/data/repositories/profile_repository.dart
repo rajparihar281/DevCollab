@@ -39,6 +39,24 @@ class ProfileRepository {
     return response.map<Profile>((j) => Profile.fromJson(j)).toList();
   }
 
+  Future<List<Profile>> getAllProfiles() async {
+    final response = await _client
+        .from('profiles')
+        .select()
+        .order('full_name');
+    return response.map<Profile>((j) => Profile.fromJson(j)).toList();
+  }
+
+  Future<List<Profile>> searchProfiles(String query) async {
+    if (query.trim().isEmpty) return getAllProfiles();
+    final response = await _client
+        .from('profiles')
+        .select()
+        .ilike('full_name', '%${query.trim()}%')
+        .order('full_name');
+    return response.map<Profile>((j) => Profile.fromJson(j)).toList();
+  }
+
   Future<Profile> upsertProfile({
     required String fullName,
     String? avatarUrl,

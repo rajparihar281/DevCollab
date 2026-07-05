@@ -30,11 +30,13 @@ class AuthRepository {
   Future<AuthResponse> signUp({
     required String email,
     required String password,
+    String? fullName,
   }) async {
     log('[AuthRepository] signUp called');
     final response = await _authService.signUp(
       email: email,
       password: password,
+      fullName: fullName,
     );
     log('[AuthRepository] signUp completed — session: ${response.session != null}');
     return response;

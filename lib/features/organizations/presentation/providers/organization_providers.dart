@@ -54,13 +54,60 @@ final organizationDetailProvider =
   return ref.read(organizationRepositoryProvider).getOrganizationById(orgId);
 });
 
-// ─── Organization Members ───────────────────────────────────────────────
-final organizationMembersProvider =
-    FutureProvider.family<List<OrganizationMember>, String>((ref, orgId) {
-  return ref
-      .read(organizationMemberRepositoryProvider)
-      .getMembers(orgId);
-});
+final organizationMembersProvider = AsyncNotifierProvider.family<
+    OrganizationMembersNotifier, List<OrganizationMember>, String>(
+  OrganizationMembersNotifier.new,
+);
+
+class OrganizationMembersNotifier
+    extends AsyncNotifier<List<OrganizationMember>> {
+  OrganizationMembersNotifier(this._orgId);
+
+  final String _orgId;
+  late OrganizationMemberRepository _repo;
+
+  @override
+  Future<List<OrganizationMember>> build() async {
+    _repo = ref.read(organizationMemberRepositoryProvider);
+    return _repo.getMembers(_orgId);
+  }
+
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+    await future;
+  }
+
+  Future<void> addMember({
+    required String userId,
+    String role = 'member',
+  }) async {
+    await _repo.addMember(
+      organizationId: _orgId,
+      userId: userId,
+      role: role,
+    );
+    ref.invalidateSelf();
+    ref.invalidate(currentUserMemberProvider(_orgId));
+    await future;
+  }
+
+  Future<void> updateMemberRole({
+    required String memberId,
+    required String role,
+  }) async {
+    await _repo.updateMemberRole(memberId: memberId, role: role);
+    ref.invalidateSelf();
+    ref.invalidate(currentUserMemberProvider(_orgId));
+    await future;
+  }
+
+  Future<void> removeMember(String memberId) async {
+    await _repo.removeMember(memberId);
+    ref.invalidateSelf();
+    ref.invalidate(currentUserMemberProvider(_orgId));
+    await future;
+  }
+}
 
 final currentUserMemberProvider =
     FutureProvider.family<OrganizationMember?, String>((ref, orgId) {
