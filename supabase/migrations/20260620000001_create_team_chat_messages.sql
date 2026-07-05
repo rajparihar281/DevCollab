@@ -13,6 +13,7 @@ create table if not exists public.team_chat_messages (
 alter table public.team_chat_messages enable row level security;
 
 -- RLS: Organization members can read team chat messages
+drop policy if exists "Team members can read chat messages" on public.team_chat_messages;
 create policy "Team members can read chat messages"
   on public.team_chat_messages
   for select
@@ -25,6 +26,7 @@ create policy "Team members can read chat messages"
   );
 
 -- RLS: Organization members can insert messages
+drop policy if exists "Team members can send chat messages" on public.team_chat_messages;
 create policy "Team members can send chat messages"
   on public.team_chat_messages
   for insert

@@ -51,8 +51,37 @@ class TeamsNotifier extends AsyncNotifier<List<Team>> {
   }
 }
 
-// ─── Team Members ───────────────────────────────────────────────────────
-final teamMembersProvider =
-    FutureProvider.family<List<TeamMember>, String>((ref, teamId) {
-  return ref.read(teamRepositoryProvider).getTeamMembers(teamId);
-});
+final teamMembersProvider = AsyncNotifierProvider.family<
+    TeamMembersNotifier, List<TeamMember>, String>(
+  TeamMembersNotifier.new,
+);
+
+class TeamMembersNotifier extends AsyncNotifier<List<TeamMember>> {
+  TeamMembersNotifier(this._teamId);
+
+  final String _teamId;
+  late TeamRepository _repo;
+
+  @override
+  Future<List<TeamMember>> build() async {
+    _repo = ref.read(teamRepositoryProvider);
+    return _repo.getTeamMembers(_teamId);
+  }
+
+  Future<void> refresh() async {
+    ref.invalidateSelf();
+    await future;
+  }
+
+  Future<void> addMember(String userId) async {
+    await _repo.addTeamMember(teamId: _teamId, userId: userId);
+    ref.invalidateSelf();
+    await future;
+  }
+
+  Future<void> removeMember(String memberId) async {
+    await _repo.removeTeamMember(memberId);
+    ref.invalidateSelf();
+    await future;
+  }
+}

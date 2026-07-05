@@ -41,13 +41,17 @@ class AuthService {
   Future<AuthResponse> signUp({
     required String email,
     required String password,
+    String? fullName,
   }) async {
-    log('[AuthService] signUp called with email: $email');
+    log('[AuthService] signUp called with email: $email, fullName: $fullName');
 
     try {
       final response = await _client.auth.signUp(
         email: email,
         password: password,
+        data: fullName != null && fullName.isNotEmpty
+            ? {'full_name': fullName}
+            : null,
       );
 
       log('[AuthService] signUp response received');
