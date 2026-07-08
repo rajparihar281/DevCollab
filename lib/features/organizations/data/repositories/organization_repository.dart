@@ -6,9 +6,13 @@ import '../../domain/models/organization.dart';
 class OrganizationRepository {
   final SupabaseClient _client = Supabase.instance.client;
 
-  /// Returns all organizations the current user is a member of.
+  /// Returns all organizations the current user owns or is a member of.
   Future<List<Organization>> getOrganizations() async {
-    final user = _client.auth.currentUser!;
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      dev.log('[OrganizationRepository] No current auth user logged in. Returning empty organizations list.');
+      return [];
+    }
     dev.log('[OrganizationRepository] Fetching organizations for user: ${user.id}');
 
     try {
@@ -18,29 +22,27 @@ class OrganizationRepository {
           .select('organization_id')
           .eq('user_id', user.id);
 
-      if (memberships.isEmpty) {
-        dev.log('[OrganizationRepository] User has 0 memberships.');
-        return [];
-      }
-
-      final orgIds = memberships
+      final memberOrgIds = memberships
           .map<String>((m) => m['organization_id'] as String)
-          .toList();
+          .toSet();
 
-      dev.log('[OrganizationRepository] Found ${orgIds.length} organization memberships: $orgIds');
-
+      // Fetch organizations owned by user OR where user is a member
       final response = await _client
           .from('organizations')
           .select()
-          .inFilter('id', orgIds)
           .order('created_at');
 
-      final orgs = response
+      final allOrgs = response
           .map<Organization>((json) => Organization.fromJson(json))
           .toList();
 
-      dev.log('[OrganizationRepository] Loaded ${orgs.length} organizations successfully.');
-      return orgs;
+      // Strictly filter to ensure user is either the owner or an explicit member
+      final myOrgs = allOrgs.where((org) {
+        return org.ownerId == user.id || memberOrgIds.contains(org.id);
+      }).toList();
+
+      dev.log('[OrganizationRepository] Loaded ${myOrgs.length} organizations strictly belonging to user ${user.id}.');
+      return myOrgs;
     } catch (e, st) {
       dev.log('[OrganizationRepository] Error fetching organizations: $e', error: e, stackTrace: st);
       rethrow;

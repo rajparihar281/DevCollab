@@ -1,6 +1,7 @@
 import 'dart:developer' as dev;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/organization_repository.dart';
 import '../../data/repositories/organization_member_repository.dart';
 import '../../domain/models/organization.dart';
@@ -26,6 +27,8 @@ class OrganizationsNotifier extends AsyncNotifier<List<Organization>> {
 
   @override
   Future<List<Organization>> build() async {
+    // Watch auth state changes so switching user accounts automatically rebuilds this provider
+    ref.watch(authStateProvider);
     dev.log('[OrganizationsNotifier] Building/loading organizations list...');
     _repo = ref.read(organizationRepositoryProvider);
     return _repo.getOrganizations();
