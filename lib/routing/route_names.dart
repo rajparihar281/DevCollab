@@ -1,7 +1,11 @@
 abstract final class RouteNames {
   static const splash = '/';
+  static const onboarding = '/onboarding';
   static const login = '/login';
   static const signup = '/signup';
+  static const settings = '/settings';
+  static const terms = '/terms';
+  static const privacy = '/privacy';
 
   static const organizations = '/organizations';
   static const createOrganization = '/organizations/create';
