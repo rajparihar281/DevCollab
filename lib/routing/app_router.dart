@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/auth/presentation/pages/forgot_password_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
+import '../features/auth/presentation/pages/reset_password_page.dart';
 import '../features/auth/presentation/pages/signup_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
@@ -37,13 +39,18 @@ GoRouter createAppRouter(AuthNotifier authNotifier, bool hasSeenOnboarding) {
         return currentPath == RouteNames.splash ? null : RouteNames.splash;
       }
 
+      final isPublicRoute = currentPath == RouteNames.terms ||
+          currentPath == RouteNames.privacy ||
+          currentPath == RouteNames.forgotPassword ||
+          currentPath == RouteNames.resetPassword;
+
       final isAuthRoute = currentPath == RouteNames.splash ||
           currentPath == RouteNames.login ||
           currentPath == RouteNames.signup ||
           currentPath == RouteNames.onboarding;
 
       if (hasSession && isAuthRoute) return RouteNames.organizations;
-      if (!hasSession && !isAuthRoute && currentPath != RouteNames.terms && currentPath != RouteNames.privacy) {
+      if (!hasSession && !isAuthRoute && !isPublicRoute) {
         return hasSeenOnboarding ? RouteNames.login : RouteNames.onboarding;
       }
       if (currentPath == RouteNames.splash && !hasSession) {
@@ -68,6 +75,14 @@ GoRouter createAppRouter(AuthNotifier authNotifier, bool hasSeenOnboarding) {
       GoRoute(
         path: RouteNames.signup,
         builder: (_, _) => const SignupPage(),
+      ),
+      GoRoute(
+        path: RouteNames.forgotPassword,
+        builder: (_, _) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: RouteNames.resetPassword,
+        builder: (_, _) => const ResetPasswordPage(),
       ),
       GoRoute(
         path: RouteNames.settings,
