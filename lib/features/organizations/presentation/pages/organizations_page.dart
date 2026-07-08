@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../shared/themes/theme_provider.dart';
 import '../../../../shared/widgets/app_loader.dart';
 import '../../../../shared/widgets/error_view.dart';
 import '../../../../shared/widgets/empty_state.dart';
@@ -16,6 +17,7 @@ class OrganizationsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final orgsAsync = ref.watch(organizationsProvider);
+    final themeMode = ref.watch(themeModeProvider);
     final theme = Theme.of(context);
 
     return Scaffold(
@@ -44,11 +46,20 @@ class OrganizationsPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout_rounded),
-            tooltip: 'Logout',
-            onPressed: () async {
-              await ref.read(authRepositoryProvider).signOut();
+            icon: Icon(
+              themeMode == ThemeMode.dark
+                  ? Icons.light_mode_rounded
+                  : Icons.dark_mode_rounded,
+            ),
+            tooltip: 'Toggle Theme Mode',
+            onPressed: () {
+              ref.read(themeModeProvider.notifier).toggleTheme();
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings_rounded),
+            tooltip: 'Settings & Legal',
+            onPressed: () => context.push(RouteNames.settings),
           ),
         ],
       ),

@@ -7,18 +7,22 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/signup_page.dart';
 import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
+import '../features/legal/presentation/pages/privacy_policy_page.dart';
+import '../features/legal/presentation/pages/terms_and_conditions_page.dart';
+import '../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../features/organizations/presentation/pages/create_organization_page.dart';
 import '../features/organizations/presentation/pages/organization_detail_page.dart';
 import '../features/organizations/presentation/pages/organizations_page.dart';
 import '../features/projects/presentation/pages/create_project_page.dart';
 import '../features/projects/presentation/pages/project_detail_page.dart';
+import '../features/settings/presentation/pages/settings_page.dart';
 import '../features/tasks/presentation/pages/create_task_page.dart';
 import '../features/tasks/presentation/pages/task_detail_page.dart';
 import '../features/teams/presentation/pages/create_team_page.dart';
 import '../features/teams/presentation/pages/team_detail_page.dart';
 import 'route_names.dart';
 
-GoRouter createAppRouter(AuthNotifier authNotifier) {
+GoRouter createAppRouter(AuthNotifier authNotifier, bool hasSeenOnboarding) {
   return GoRouter(
     initialLocation: RouteNames.splash,
     refreshListenable: authNotifier,
@@ -27,7 +31,7 @@ GoRouter createAppRouter(AuthNotifier authNotifier) {
       final hasSession = authNotifier.session != null;
       final currentPath = state.matchedLocation;
 
-      log('[GoRouter redirect] path=$currentPath, initialized=$isInitialized, hasSession=$hasSession');
+      log('[GoRouter redirect] path=$currentPath, initialized=$isInitialized, hasSession=$hasSession, onboarding=$hasSeenOnboarding');
 
       if (!isInitialized) {
         return currentPath == RouteNames.splash ? null : RouteNames.splash;
@@ -35,12 +39,15 @@ GoRouter createAppRouter(AuthNotifier authNotifier) {
 
       final isAuthRoute = currentPath == RouteNames.splash ||
           currentPath == RouteNames.login ||
-          currentPath == RouteNames.signup;
+          currentPath == RouteNames.signup ||
+          currentPath == RouteNames.onboarding;
 
       if (hasSession && isAuthRoute) return RouteNames.organizations;
-      if (!hasSession && !isAuthRoute) return RouteNames.login;
+      if (!hasSession && !isAuthRoute && currentPath != RouteNames.terms && currentPath != RouteNames.privacy) {
+        return hasSeenOnboarding ? RouteNames.login : RouteNames.onboarding;
+      }
       if (currentPath == RouteNames.splash && !hasSession) {
-        return RouteNames.login;
+        return hasSeenOnboarding ? RouteNames.login : RouteNames.onboarding;
       }
 
       return null;
@@ -51,12 +58,28 @@ GoRouter createAppRouter(AuthNotifier authNotifier) {
         builder: (_, _) => const SplashPage(),
       ),
       GoRoute(
+        path: RouteNames.onboarding,
+        builder: (_, _) => const OnboardingPage(),
+      ),
+      GoRoute(
         path: RouteNames.login,
         builder: (_, _) => const LoginPage(),
       ),
       GoRoute(
         path: RouteNames.signup,
         builder: (_, _) => const SignupPage(),
+      ),
+      GoRoute(
+        path: RouteNames.settings,
+        builder: (_, _) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.terms,
+        builder: (_, _) => const TermsAndConditionsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.privacy,
+        builder: (_, _) => const PrivacyPolicyPage(),
       ),
 
       // Organizations

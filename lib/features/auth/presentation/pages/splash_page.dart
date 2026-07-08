@@ -16,30 +16,35 @@ class SplashPage extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Logo Image Placeholder — can be replaced with Image.asset('assets/logo.png') later
             Container(
+              width: 100,
+              height: 100,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
                     AppColors.primary,
-                    AppColors.secondary.withValues(alpha: 0.8),
+                    AppColors.secondary.withValues(alpha: 0.85),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
+                    color: AppColors.primary.withValues(alpha: 0.4),
+                    blurRadius: 28,
+                    offset: const Offset(0, 12),
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.hub_rounded,
-                size: 52,
-                color: Colors.white,
+              child: const Center(
+                child: Icon(
+                  Icons.hub_rounded,
+                  size: 54,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(height: 28),

@@ -1,9 +1,12 @@
 import 'dart:developer';
 
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dev_collab/routing/route_names.dart';
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -21,6 +24,8 @@ class _SignupPageState extends ConsumerState<SignupPage>
 
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _termsAccepted = false;
+  bool _privacyAccepted = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -50,6 +55,20 @@ class _SignupPageState extends ConsumerState<SignupPage>
   Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
 
+    if (!_termsAccepted || !_privacyAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'You must agree to both the Terms & Conditions and Privacy Policy to register.',
+            style: TextStyle(fontWeight: FontWeight.w600),
+          ),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
     final fullName = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -59,13 +78,27 @@ class _SignupPageState extends ConsumerState<SignupPage>
 
     try {
       final repository = ref.read(authRepositoryProvider);
-      await repository.signUp(
+      final response = await repository.signUp(
         email: email,
         password: password,
         fullName: fullName,
       );
 
-      log('[SignupPage] Registration successful');
+      // Store explicit consent & timestamp in profiles DB as defending proof
+      if (response.user != null) {
+        final now = DateTime.now().toIso8601String();
+        try {
+          await Supabase.instance.client.from('profiles').update({
+            'terms_accepted_at': now,
+            'privacy_accepted_at': now,
+            'consent_given': true,
+          }).eq('id', response.user!.id);
+        } catch (err) {
+          log('[SignupPage] Profile consent update note: $err');
+        }
+      }
+
+      log('[SignupPage] Registration successful and legal consent recorded');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -499,7 +532,46 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 28),
+                                const SizedBox(height: 16),
+
+                                // Legal Consent Checkboxes
+                                CheckboxListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  activeColor: AppColors.primary,
+                                  value: _termsAccepted,
+                                  onChanged: (val) => setState(() => _termsAccepted = val ?? false),
+                                  title: GestureDetector(
+                                    onTap: () => context.push(RouteNames.terms),
+                                    child: const Text(
+                                      'I agree to the Terms & Conditions',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.primary,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                CheckboxListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  controlAffinity: ListTileControlAffinity.leading,
+                                  activeColor: AppColors.primary,
+                                  value: _privacyAccepted,
+                                  onChanged: (val) => setState(() => _privacyAccepted = val ?? false),
+                                  title: GestureDetector(
+                                    onTap: () => context.push(RouteNames.privacy),
+                                    child: const Text(
+                                      'I agree to the Privacy Policy',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: AppColors.primary,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
 
                                 // Signup Button
                                 ElevatedButton(
