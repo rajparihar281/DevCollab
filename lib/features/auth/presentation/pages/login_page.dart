@@ -1,6 +1,10 @@
 import 'dart:developer';
 
+import 'package:dev_collab/features/auth/domain/models/saved_account.dart';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
+import 'package:dev_collab/features/auth/presentation/providers/saved_accounts_provider.dart';
+import 'package:dev_collab/features/auth/presentation/services/pending_login_credential_holder.dart';
+import 'package:dev_collab/features/auth/presentation/widgets/saved_accounts_section.dart';
 import 'package:dev_collab/routing/route_names.dart';
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -47,7 +51,13 @@ class _LoginPageState extends ConsumerState<LoginPage>
     super.dispose();
   }
 
-  Future<void> _login() async {
+  Future<void> _onSelectSavedAccount(SavedAccount account) async {
+    _emailController.text = account.email;
+    _passwordController.text = account.securePassword;
+    await _login(promptSave: false);
+  }
+
+  Future<void> _login({bool promptSave = true}) async {
     if (!_formKey.currentState!.validate()) return;
 
     final email = _emailController.text.trim();
@@ -57,6 +67,20 @@ class _LoginPageState extends ConsumerState<LoginPage>
     setState(() => _isLoading = true);
 
     try {
+      if (promptSave) {
+        final savedAccs = ref.read(savedAccountsProvider).value ?? [];
+        final isAlreadySaved = savedAccs.any(
+          (a) => a.email.toLowerCase() == email.toLowerCase(),
+        );
+        if (!isAlreadySaved) {
+          PendingLoginCredentialHolder.set(email, password);
+        } else {
+          PendingLoginCredentialHolder.clear();
+        }
+      } else {
+        PendingLoginCredentialHolder.clear();
+      }
+
       final repository = ref.read(authRepositoryProvider);
       await repository.signIn(
         email: email,
@@ -241,6 +265,9 @@ class _LoginPageState extends ConsumerState<LoginPage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
+                                SavedAccountsSection(
+                                  onSelectAccount: _onSelectSavedAccount,
+                                ),
                                 // Email Field
                                 const Text(
                                   'Email Address',
@@ -326,16 +353,8 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                       ),
                                     ),
                                     TextButton(
-                                      onPressed: () {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Please contact your organization admin to reset your password.',
-                                            ),
-                                          ),
-                                        );
-                                      },
+                                      onPressed: () =>
+                                          context.push(RouteNames.forgotPassword),
                                       style: TextButton.styleFrom(
                                         padding: EdgeInsets.zero,
                                         minimumSize: Size.zero,

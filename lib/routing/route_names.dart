@@ -6,6 +6,10 @@ abstract final class RouteNames {
   static const settings = '/settings';
   static const terms = '/terms';
   static const privacy = '/privacy';
+  static const forgotPassword = '/forgot-password';
+  static const resetPassword = '/reset-password';
+  static const profile = '/profile';
+  static const notificationPreferences = '/notifications/preferences';
 
   static const organizations = '/organizations';
   static const createOrganization = '/organizations/create';

@@ -1,10 +1,10 @@
+import 'package:dev_collab/features/auth/presentation/providers/user_profile_provider.dart';
+import 'package:dev_collab/routing/route_names.dart';
+import 'package:dev_collab/shared/themes/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../../../routing/route_names.dart';
-import '../../../../shared/themes/theme_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -14,6 +14,7 @@ class SettingsPage extends ConsumerWidget {
     final theme = Theme.of(context);
     final themeMode = ref.watch(themeModeProvider);
     final user = Supabase.instance.client.auth.currentUser;
+    final profile = ref.watch(userProfileProvider).value;
 
     return Scaffold(
       appBar: AppBar(
@@ -24,52 +25,95 @@ class SettingsPage extends ConsumerWidget {
         children: [
           // User Section
           if (user != null) ...[
+            InkWell(
+              onTap: () => context.push(RouteNames.profile),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: theme.cardTheme.color,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.dividerColor,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 26,
+                      backgroundColor: theme.colorScheme.primary,
+                      backgroundImage: profile?.avatarUrl != null &&
+                              profile!.avatarUrl!.isNotEmpty
+                          ? NetworkImage(profile.avatarUrl!)
+                          : null,
+                      child: (profile?.avatarUrl == null ||
+                              profile!.avatarUrl!.isEmpty)
+                          ? Text(
+                              (user.email ?? 'U')[0].toUpperCase(),
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onPrimary,
+                              ),
+                            )
+                          : null,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user.email ?? 'DevCollab User',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Edit Profile, Bio & Private Teams',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      color: theme.iconTheme.color,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Notifications Section
+            Text(
+              'NOTIFICATIONS & EMAILS',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+                letterSpacing: 1.2,
+              ),
+            ),
+            const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: theme.cardTheme.color,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: theme.dividerColor,
-                ),
+                border: Border.all(color: theme.dividerColor),
               ),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 26,
-                    backgroundColor: theme.colorScheme.primary,
-                    child: Text(
-                      (user.email ?? 'U')[0].toUpperCase(),
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user.email ?? 'DevCollab User',
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'ID: ${user.id.substring(0, 8)}...',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.textTheme.bodySmall?.color
-                                ?.withValues(alpha: 0.6),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: ListTile(
+                leading: Icon(
+                  Icons.notifications_active_outlined,
+                  color: theme.colorScheme.primary,
+                ),
+                title: const Text('Notification & Email Preferences'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(RouteNames.notificationPreferences),
               ),
             ),
             const SizedBox(height: 24),
@@ -91,32 +135,23 @@ class SettingsPage extends ConsumerWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: theme.dividerColor),
             ),
-            child: Column(
-              children: [
-                ListTile(
-                  leading: Icon(
-                    themeMode == ThemeMode.dark
-                        ? Icons.dark_mode_rounded
-                        : Icons.light_mode_rounded,
-                    color: theme.colorScheme.primary,
-                  ),
-                  title: const Text('OLED Dark Theme'),
-                  subtitle: Text(
-                    themeMode == ThemeMode.dark
-                        ? 'True OLED pitch black mode (#000000)'
-                        : 'Bright clean light mode',
-                  ),
-                  trailing: Switch(
-                    value: themeMode == ThemeMode.dark,
-                    activeThumbColor: theme.colorScheme.primary,
-                    onChanged: (val) {
-                      ref
-                          .read(themeModeProvider.notifier)
-                          .setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
-                    },
-                  ),
-                ),
-              ],
+            child: ListTile(
+              leading: Icon(
+                themeMode == ThemeMode.dark
+                    ? Icons.dark_mode_rounded
+                    : Icons.light_mode_rounded,
+                color: theme.colorScheme.primary,
+              ),
+              title: const Text('OLED Dark Theme'),
+              trailing: Switch(
+                value: themeMode == ThemeMode.dark,
+                activeThumbColor: theme.colorScheme.primary,
+                onChanged: (val) {
+                  ref
+                      .read(themeModeProvider.notifier)
+                      .setThemeMode(val ? ThemeMode.dark : ThemeMode.light);
+                },
+              ),
             ),
           ),
           const SizedBox(height: 24),
