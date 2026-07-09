@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -64,6 +65,51 @@ class AuthService {
       log('[AuthService] signUp STACK: $st');
       rethrow;
     }
+  }
+
+  Future<Map<String, dynamic>?> getProfile(String userId) async {
+    try {
+      final data = await _client
+          .from('profiles')
+          .select()
+          .eq('id', userId)
+          .maybeSingle();
+      return data;
+    } catch (e) {
+      log('[AuthService] getProfile error: $e');
+      return null;
+    }
+  }
+
+  Future<void> updateProfile(String userId, Map<String, dynamic> updates) async {
+    await _client.from('profiles').update(updates).eq('id', userId);
+  }
+
+  Future<String> uploadProfilePicture(File file, String userId) async {
+    final fileExt = file.path.split('.').last;
+    final fileName = '${userId}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    const bucketName = 'profile pics';
+
+    try {
+      await _client.storage.from(bucketName).upload(
+            fileName,
+            file,
+            fileOptions: const FileOptions(upsert: true),
+          );
+    } catch (e) {
+      log('[AuthService] error uploading to "$bucketName": $e');
+      final errStr = e.toString();
+      if (errStr.contains('403') ||
+          errStr.contains('row-level security') ||
+          errStr.contains('Unauthorized')) {
+        throw Exception(
+          'Storage RLS Policy Violation (403): Please run the SQL migration in supabase/migrations/20260710000002_add_storage_bucket_policies.sql to allow uploads to bucket "$bucketName".',
+        );
+      }
+      rethrow;
+    }
+
+    return _client.storage.from(bucketName).getPublicUrl(fileName);
   }
 
   Future<void> signOut() async {

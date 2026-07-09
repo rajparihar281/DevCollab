@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:dev_collab/features/auth/domain/models/saved_account.dart';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dev_collab/features/auth/presentation/providers/saved_accounts_provider.dart';
+import 'package:dev_collab/features/auth/presentation/services/pending_login_credential_holder.dart';
 import 'package:dev_collab/features/auth/presentation/widgets/saved_accounts_section.dart';
 import 'package:dev_collab/routing/route_names.dart';
 import 'package:dev_collab/shared/themes/app_colors.dart';
@@ -56,71 +57,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
     await _login(promptSave: false);
   }
 
-  Future<void> _promptSaveCredentials(String email, String password) async {
-    await showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        final theme = Theme.of(ctx);
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.key_rounded, color: theme.colorScheme.primary),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Save your login info?',
-                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'We can save your account info on this device so you don\'t need to enter it next time.',
-                textAlign: TextAlign.center,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: () {
-                  ref.read(savedAccountsProvider.notifier).saveAccount(
-                        email: email,
-                        password: password,
-                        fullName: email.split('@').first,
-                      );
-                  Navigator.pop(ctx);
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50),
-                ),
-                child: const Text('Save Info'),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => Navigator.pop(ctx),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size.fromHeight(44),
-                ),
-                child: const Text('Not Now'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Future<void> _login({bool promptSave = true}) async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -131,6 +67,20 @@ class _LoginPageState extends ConsumerState<LoginPage>
     setState(() => _isLoading = true);
 
     try {
+      if (promptSave) {
+        final savedAccs = ref.read(savedAccountsProvider).value ?? [];
+        final isAlreadySaved = savedAccs.any(
+          (a) => a.email.toLowerCase() == email.toLowerCase(),
+        );
+        if (!isAlreadySaved) {
+          PendingLoginCredentialHolder.set(email, password);
+        } else {
+          PendingLoginCredentialHolder.clear();
+        }
+      } else {
+        PendingLoginCredentialHolder.clear();
+      }
+
       final repository = ref.read(authRepositoryProvider);
       await repository.signIn(
         email: email,
@@ -138,9 +88,6 @@ class _LoginPageState extends ConsumerState<LoginPage>
       );
 
       log('[LoginPage] Login successful');
-      if (mounted && promptSave) {
-        await _promptSaveCredentials(email, password);
-      }
       // AuthGate / Router redirect handles navigation reactively
     } catch (e) {
       log('[LoginPage] Login error: $e');
