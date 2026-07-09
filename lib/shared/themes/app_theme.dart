@@ -9,12 +9,14 @@ class AppTheme {
   static const _secondaryColor = Color(0xFF00E5FF);
   static const _errorColor = Color(0xFFFF4B6E);
 
-  // OLED True Dark Surface Colors (#000000 background)
+  // Pure OLED Monochromatic Colors (#000000 background & #FFFFFF accents)
   static const _oledBackground = Color(0xFF000000);
-  static const _oledSurface = Color(0xFF0A0A0E);
-  static const _oledSurfaceVariant = Color(0xFF14141C);
-  static const _oledBorder = Color(0xFF222230);
-  static const _oledOnSurface = Color(0xFFF4F4FA);
+  static const _oledSurface = Color(0xFF0A0A0A);
+  static const _oledSurfaceVariant = Color(0xFF141414);
+  static const _oledBorder = Color(0xFF262626);
+  static const _oledOnSurface = Color(0xFFFFFFFF);
+  static const _oledPrimary = Color(0xFFFFFFFF);
+  static const _oledOnPrimary = Color(0xFF000000);
 
   // Crisp Bright Light Colors
   static const _lightBackground = Color(0xFFFAFAFC);
@@ -28,9 +30,9 @@ class AppTheme {
     return base.copyWith(
       colorScheme: const ColorScheme.dark(
         brightness: Brightness.dark,
-        primary: _primaryColor,
-        onPrimary: Colors.white,
-        secondary: _secondaryColor,
+        primary: _oledPrimary,
+        onPrimary: _oledOnPrimary,
+        secondary: Color(0xFFCCCCCC),
         onSecondary: Colors.black,
         error: _errorColor,
         surface: _oledSurface,
@@ -64,12 +66,12 @@ class AppTheme {
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _primaryColor,
-          foregroundColor: Colors.white,
+          backgroundColor: _oledPrimary,
+          foregroundColor: _oledOnPrimary,
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 15),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
           elevation: 0,
-          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 15),
+          textStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 15),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
