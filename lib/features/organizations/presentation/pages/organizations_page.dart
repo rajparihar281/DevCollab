@@ -1,3 +1,6 @@
+import 'package:dev_collab/features/auth/presentation/providers/saved_accounts_provider.dart';
+import 'package:dev_collab/features/auth/presentation/services/pending_login_credential_holder.dart';
+import 'package:dev_collab/shared/services/sticky_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -11,11 +14,110 @@ import '../../../../routing/route_names.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
 import '../widgets/organization_card.dart';
 
-class OrganizationsPage extends ConsumerWidget {
+class OrganizationsPage extends ConsumerStatefulWidget {
   const OrganizationsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<OrganizationsPage> createState() => _OrganizationsPageState();
+}
+
+class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkPendingLoginPrompt();
+      _initStickyNotification();
+    });
+  }
+
+  Future<void> _initStickyNotification() async {
+    try {
+      await StickyNotificationService().showStickyNotification(
+        id: 101,
+        title: 'DevCollab Active Workspace',
+        body: 'Tap to resume collaboration. Persistent alert active.',
+      );
+    } catch (_) {}
+  }
+
+  Future<void> _checkPendingLoginPrompt() async {
+    final pendingEmail = PendingLoginCredentialHolder.pendingEmail;
+    final pendingPwd = PendingLoginCredentialHolder.pendingPassword;
+
+    if (pendingEmail != null && mounted) {
+      PendingLoginCredentialHolder.clear();
+      await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) {
+          final theme = Theme.of(ctx);
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.key_rounded,
+                      color: theme.colorScheme.primary),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Save your login info?',
+                  style: theme.textTheme.titleLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'We can save your login info for $pendingEmail on this device so you don\'t need to enter it next time.',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodyMedium?.color
+                        ?.withValues(alpha: 0.7),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(savedAccountsProvider.notifier).saveAccount(
+                          email: pendingEmail,
+                          password: pendingPwd ?? '',
+                          fullName: pendingEmail.split('@').first,
+                        );
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size.fromHeight(50),
+                  ),
+                  child: const Text('Save Info'),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  style: TextButton.styleFrom(
+                    minimumSize: const Size.fromHeight(44),
+                  ),
+                  child: const Text('Not Now'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final orgsAsync = ref.watch(organizationsProvider);
     final themeMode = ref.watch(themeModeProvider);
     final theme = Theme.of(context);

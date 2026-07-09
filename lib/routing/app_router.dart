@@ -11,10 +11,12 @@ import '../features/auth/presentation/pages/splash_page.dart';
 import '../features/chat/presentation/pages/chat_page.dart';
 import '../features/legal/presentation/pages/privacy_policy_page.dart';
 import '../features/legal/presentation/pages/terms_and_conditions_page.dart';
+import '../features/notifications/presentation/pages/notification_preferences_page.dart';
 import '../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../features/organizations/presentation/pages/create_organization_page.dart';
 import '../features/organizations/presentation/pages/organization_detail_page.dart';
 import '../features/organizations/presentation/pages/organizations_page.dart';
+import '../features/profile/presentation/pages/profile_page.dart';
 import '../features/projects/presentation/pages/create_project_page.dart';
 import '../features/projects/presentation/pages/project_detail_page.dart';
 import '../features/settings/presentation/pages/settings_page.dart';
@@ -87,6 +89,14 @@ GoRouter createAppRouter(AuthNotifier authNotifier, bool hasSeenOnboarding) {
       GoRoute(
         path: RouteNames.settings,
         builder: (_, _) => const SettingsPage(),
+      ),
+      GoRoute(
+        path: RouteNames.profile,
+        builder: (_, _) => const ProfilePage(),
+      ),
+      GoRoute(
+        path: RouteNames.notificationPreferences,
+        builder: (_, _) => const NotificationPreferencesPage(),
       ),
       GoRoute(
         path: RouteNames.terms,
