@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dev_collab/features/auth/domain/models/profile.dart';
 import 'package:dev_collab/features/auth/presentation/providers/user_profile_provider.dart';
+import 'package:dev_collab/features/profile/presentation/pages/avatar_editor_screen.dart';
 import 'package:dev_collab/routing/route_names.dart';
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:file_picker/file_picker.dart';
@@ -34,20 +35,101 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   bool _saving = false;
   bool _uploadingAvatar = false;
 
-  Future<void> _pickAndUploadAvatar() async {
+  void _showAvatarActionSheet(Profile? profile) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final hasPhoto = profile?.avatarUrl != null && profile!.avatarUrl!.isNotEmpty;
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 12),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[600],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
+                title: const Text('Choose Photo & Edit'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickEditAndUploadAvatar();
+                },
+              ),
+              if (hasPhoto)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
+                  title: const Text(
+                    'Remove Current Photo',
+                    style: TextStyle(color: AppColors.error),
+                  ),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _removeAvatar();
+                  },
+                ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _removeAvatar() async {
+    setState(() => _uploadingAvatar = true);
+    try {
+      await ref.read(userProfileProvider.notifier).deleteAvatar();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile picture removed.'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      log('[ProfilePage] error deleting avatar: $e');
+    } finally {
+      if (mounted) setState(() => _uploadingAvatar = false);
+    }
+  }
+
+  Future<void> _pickEditAndUploadAvatar() async {
     try {
       final result = await FilePicker.platform.pickFiles(type: FileType.image);
       if (result == null || result.files.single.path == null) return;
 
+      final originalFile = File(result.files.single.path!);
+
+      if (!mounted) return;
+      final editedFile = await Navigator.push<File?>(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AvatarEditorScreen(imageFile: originalFile),
+        ),
+      );
+
+      if (editedFile == null) return;
+
       setState(() => _uploadingAvatar = true);
-      final file = File(result.files.single.path!);
       final newUrl =
-          await ref.read(userProfileProvider.notifier).uploadAvatar(file);
+          await ref.read(userProfileProvider.notifier).uploadAvatar(editedFile);
 
       if (mounted && newUrl != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Profile picture uploaded successfully!'),
+            content: Text('Profile picture updated successfully!'),
             backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -264,7 +346,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   // Avatar Section
                   Center(
                     child: GestureDetector(
-                      onTap: _uploadingAvatar ? null : _pickAndUploadAvatar,
+                      onTap: _uploadingAvatar
+                          ? null
+                          : () => _showAvatarActionSheet(profile),
                       child: Stack(
                         children: [
                           CircleAvatar(

@@ -38,4 +38,11 @@ class UserProfileNotifier extends AsyncNotifier<Profile?> {
     });
     return url;
   }
+
+  Future<void> deleteAvatar() async {
+    await updateProfile({
+      'avatar_url': null,
+      'updated_at': DateTime.now().toIso8601String(),
+    });
+  }
 }
