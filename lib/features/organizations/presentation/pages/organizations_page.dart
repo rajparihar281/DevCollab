@@ -1,5 +1,6 @@
 import 'package:dev_collab/features/auth/presentation/providers/saved_accounts_provider.dart';
 import 'package:dev_collab/features/auth/presentation/services/pending_login_credential_holder.dart';
+import 'package:dev_collab/features/organizations/presentation/pages/org_workspace_page.dart';
 import 'package:dev_collab/shared/services/sticky_notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,17 +28,13 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkPendingLoginPrompt();
-      _initStickyNotification();
+      _dismissOngoingNotification();
     });
   }
 
-  Future<void> _initStickyNotification() async {
+  Future<void> _dismissOngoingNotification() async {
     try {
-      await StickyNotificationService().showStickyNotification(
-        id: 101,
-        title: 'DevCollab Active Workspace',
-        body: 'Tap to resume collaboration. Persistent alert active.',
-      );
+      await StickyNotificationService().dismissStickyNotification(101);
     } catch (_) {}
   }
 
@@ -148,6 +145,11 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
         ),
         actions: [
           IconButton(
+            icon: const Icon(Icons.vpn_key_rounded),
+            tooltip: 'Join with Invite Code',
+            onPressed: _showJoinWithCodeModal,
+          ),
+          IconButton(
             icon: Icon(
               themeMode == ThemeMode.dark
                   ? Icons.light_mode_rounded
@@ -176,7 +178,7 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
                 icon: Icons.domain_rounded,
                 title: 'No organizations yet',
                 subtitle:
-                    'Create your first organization to start collaborating with your team.',
+                    'Create your first organization or join with an invite code.',
                 action: () => context.push(RouteNames.createOrganization),
                 actionLabel: 'Create Organization',
               )
@@ -188,8 +190,11 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (_, i) => OrganizationCard(
                     organization: orgs[i],
-                    onTap: () => context.push(
-                      RouteNames.organizationDetailPath(orgs[i].id),
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => OrgWorkspacePage(organization: orgs[i]),
+                      ),
                     ),
                     onDelete: orgs[i].ownerId ==
                             ref.read(authRepositoryProvider).currentUser?.id
@@ -207,9 +212,76 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
               ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_new_organization',
         onPressed: () => context.push(RouteNames.createOrganization),
         icon: const Icon(Icons.add_rounded),
         label: const Text('New Organization'),
+      ),
+    );
+  }
+
+  void _showJoinWithCodeModal() {
+    final codeCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Join Organization'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Enter the invite code shared by your organization leader (e.g., DEV-12345):',
+              style: TextStyle(fontSize: 13, color: Colors.grey),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: codeCtrl,
+              textCapitalization: TextCapitalization.characters,
+              decoration: const InputDecoration(
+                labelText: 'Invite Code',
+                hintText: 'DEV-XXXXX',
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final code = codeCtrl.text.trim();
+              if (code.isEmpty) return;
+              Navigator.pop(ctx);
+              try {
+                await ref
+                    .read(organizationRepositoryProvider)
+                    .joinOrgWithCode(code);
+                ref.invalidate(organizationsProvider);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Joined organization successfully!'),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceAll('Exception: ', '')),
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('Join'),
+          ),
+        ],
       ),
     );
   }

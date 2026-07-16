@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import '../../data/repositories/organization_repository.dart';
 import '../../data/repositories/organization_member_repository.dart';
+import '../../domain/models/kanban_project.dart';
+import '../../domain/models/kanban_task.dart';
+import '../../domain/models/org_invite.dart';
+import '../../domain/models/org_message.dart';
 import '../../domain/models/organization.dart';
 import '../../domain/models/organization_member.dart';
 
@@ -140,4 +144,26 @@ final currentUserMemberProvider =
   return ref
       .read(organizationMemberRepositoryProvider)
       .getCurrentUserMember(orgId);
+});
+
+// ─── Collaboration Providers ──────────────────────────────────────────────
+
+final orgProjectsProvider =
+    FutureProvider.family<List<KanbanProject>, String>((ref, orgId) {
+  return ref.read(organizationRepositoryProvider).getProjects(orgId);
+});
+
+final orgTasksProvider =
+    FutureProvider.family<List<KanbanTask>, String>((ref, orgId) {
+  return ref.read(organizationRepositoryProvider).getTasks(orgId);
+});
+
+final orgMessagesStreamProvider =
+    StreamProvider.family<List<OrgMessage>, String>((ref, orgId) {
+  return ref.read(organizationRepositoryProvider).getMessagesStream(orgId);
+});
+
+final orgInvitesProvider =
+    FutureProvider.family<List<OrgInvite>, String>((ref, orgId) {
+  return ref.read(organizationRepositoryProvider).getInvites(orgId);
 });

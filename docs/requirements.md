@@ -1,62 +1,32 @@
-# DevCollab Requirements
+# DevCollab Functional & System Requirements
 
-# Problem Statement
-**Modern teams often use multiple tools for task management, communication, file sharing, and project tracking. This leads to fragmented workflows, reduced productivity, and difficulty keeping project information synchronized.
-DevCollab aims to provide a centralized collaborative workspace where teams can manage projects, track tasks, communicate, and collaborate in real time.**
-# Target Users
- - Small and medium-sized development teams
- - Startup teams
- - Freelance teams working on shared projects
- - Student project teams
- - Product managers
- - Designers and developers collaborating on tasks
+## Problem Statement
+Modern teams often use multiple tools for task management, communication, file sharing, and project tracking. DevCollab provides a centralized collaborative workspace where teams manage projects, track tasks, communicate, and collaborate in real time.
 
-# Core Features
+---
 
-## Authentication & Access Control
-- User registration and login
-- Secure authentication
-- Role-based access control (Owner, Admin, Member, Viewer)
+## Core Features Implemented
 
-## Organization Management
-- Create organizations
-- Invite members
-- Manage organization tools
+### 1. Authentication & Multi-Account Management
+- User registration and login via Supabase Auth.
+- **Instagram-style Saved Credentials Vault**: Users can opt to save credentials locally upon login to enable 1-click account switching without re-entering passwords.
+- Option to remove saved accounts directly from account switcher cards.
 
-## Team Management
-- Create and manage projects
-- Organize work within teams
+### 2. Organization & Workspace Management
+- Create organizations and access dynamic 3-tab workspaces (`OrgWorkspacePage`).
+- **Kanban Task Board & Sprint Tracker**:
+  - Filter tasks by `All`, `To Do`, `In Progress`, `Code Review`, and `Done`.
+  - Assign priority levels (`Low`, `Medium`, `High`, `Urgent`) and due dates.
+  - Interactive status transition menus.
+- **Real-Time Team Chat & Announcements**:
+  - Live team chat room powered by Supabase Realtime WebSocket streams.
+  - Announcement broadcasting with highlighted badges for leaders.
+- **Member Hierarchy & Invite Code Management**:
+  - Role hierarchy: `OWNER`, `ADMIN`, `MD`, `MG`, `EMP`, `MEMBER`.
+  - Direct member invitation dialog (`AddOrganizationMemberDialog`).
+  - Shareable join code generation (`DEV-XXXXX`) and instant join modal.
+  - Ability to delete/revoke invite codes.
 
-## Collaboration
-- Task comments and discussions
-- Team chat
-- Activity History
-
-## File Management
-- Upload Attachments
-- View and download project files
-
-# Real-Time Features
- The followingupdates should reflected instantly across connected users:
- - Task creation
- - Task updates
- - Task status changes
- - Task assignment changes
- - Kanban board movement
- - New comments
- - Team chat messages
- - Acitvity log updates
-
-# Out of Scope
-
-The following features are not included in the MVP.
-
-- Video conferencing
-- Voice calls
-- Billing and subscription management
-- AI-powered task generation
-- Advanced analytics and reporting 
-- Calendar Integrations
-- Third-party marketplace integrations
-- Desktop applications
-- Time tracking and invoicing
+### 3. Profile & Avatar Management
+- Custom avatar upload to Supabase Storage `"profile pics"` bucket with interactive cropping and rotation.
+- Editable rich fields: `bio`, `dob`, `job_description`, `current_company`, and private `current_teams` list.

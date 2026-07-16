@@ -132,6 +132,32 @@ class _LoginPageState extends ConsumerState<LoginPage>
     return raw.replaceAll('Exception:', '').trim();
   }
 
+  Future<void> _loginWithGoogle() async {
+    log('[LoginPage] Starting Google login');
+    setState(() => _isLoading = true);
+    
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.signInWithGoogle('732760635408-d2qmcnliljqp348v1mj240bn40sdsnjm.apps.googleusercontent.com');
+      log('[LoginPage] Google login successful');
+      if (mounted) context.go(RouteNames.organizations);
+    } catch (e) {
+      log('[LoginPage] Google login failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google Sign-In failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -486,6 +512,42 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                             ),
                                           ],
                                         ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Google Sign In Button
+                                ElevatedButton(
+                                  onPressed: _isLoading ? null : _loginWithGoogle,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black87,
+                                    disabledBackgroundColor: Colors.grey.shade200,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(color: Colors.grey.shade300),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  child: const Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.g_mobiledata_rounded,
+                                        size: 26,
+                                        color: Colors.black87,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Sign In with Google',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

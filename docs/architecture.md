@@ -1,107 +1,55 @@
 # DevCollab Architecture
+
 ## Overview
+DevCollab is a full-stack, enterprise-grade collaborative task management and team workspace platform built using **Flutter** and **Supabase PostgreSQL & Realtime**.
 
-DevCollab is a full-stack collaborative task management platforms built using Flutter and Supabase.
+The system follows a clean multi-layer architecture with feature-driven organization:
+- **Presentation Layer**: Riverpod 2.x (`AsyncNotifier`, `StreamProvider`, `StateNotifierProvider`), responsive layouts, glassmorphism dark/light themes.
+- **Domain Layer**: Strongly-typed immutable models (`Organization`, `OrganizationMember`, `KanbanProject`, `KanbanTask`, `OrgMessage`, `OrgInvite`, `Profile`).
+- **Data Layer**: Clean repositories communicating directly with Supabase Auth, PostgreSQL tables, Storage buckets, and Realtime WebSocket channels.
 
-The System follows a client-server architecture where Flutter serves as the client application and Supabase proviedes authentication, database, realtime communication, and files storage services.
+---
 
-# High-Level Architecture
+## High-Level System Diagram
 
 ```text
 User
-↓
-Flutter Application
-↓
+ ↓
+Flutter Application (DevCollab)
+ ├── Multi-Account Local Credential Vault (Instagram-style fast account switching)
+ ├── Organization & Team Workspace Hub (3-Tab Dynamic Workspace)
+ │    ├── Kanban Board & Sprint Tracker (Draggable/clickable tasks, priority tags, due dates)
+ │    ├── Real-Time Team Chat & Announcements (Live Supabase WebSocket streaming)
+ │    └── Members (MD/MG/EMP/Admin) & Join Code Manager
+ └── Interactive Profile & Avatar Editor (Client-side crop/rotate + Supabase Storage)
+ ↓
 Supabase Services
-├── Auth
-├── PostgreSQL Database
-├── Realtime Channels
-└── Storage
-↓
-Other Connected Clients
-```
-## Frontend Layer
-- **Flutter**
-
-  Responsible for:
-  - User Interface
-  - Navigation
-  - State Management
-  - Offline Data Handling
-  - Deep Linking 
- ## Local Storage
- 
- Used for:
-
- - Offline queue
- - Cachced data
- - Temporary synchronization state
-
- Techology:
-
- - Drift
- - Hive
-
- ## Backend Layer
- ## Supabase Auth
-
- Responsible for:
- - Organizations
- - Teams
- - Projects
- - Tasks
- - Comments
- - Acitivty Logs
-
- ## Supabase Realtime
-
- Responsible for:
-
- - Task updates
- - Comment synchronization
- - Board synchronization
- - Team Chat Events
-
- ## Supabase Storage
-
- Responsible for:
- - File uploads
- - File downloads
- - Attachment management
-
- ## Multi-Tenant Design
-
- Data is isolated at the organization level.
-```text
-Organization
-└── Teams
-└── Projects
-└── Tasks
-```
-Row Level Security (RLS) ensures users can only access data belonging to organizations they are members of.
-
-
-## Realtime Flow
-```text 
-User A updates a task
-↓
-PostgreSQL Update
-↓
-Supabase Realtime Event
-↓
-User B receives update instantly
+ ├── Auth (Row-Level Security & Multi-Session capabilities)
+ ├── PostgreSQL Database (profiles, organizations, organization_members, projects, tasks, org_messages, org_invites)
+ ├── Realtime Channels (PostgreSQL WAL replication for instant chat & task board updates)
+ └── Storage Buckets ("profile pics" public bucket with RLS policies)
 ```
 
-## Offline Strategy
+---
 
-Changes created while offline are stored locally
-1. Local changes are queued.
-2. Queue is synchronized with supabase.
-3. Realtime updates refresh connected clients.
+## Key Modules Implemented
 
-## Security 
-- Supabase Authentication
-- Row Level Security (RLS)
-- Organization-based access control
-- Role-based permissions
-- Secure file access policies
+### 1. Multi-Account Credential Vault & Fast Account Switcher
+- Stores encrypted login tokens locally so users who opt to save credentials can tap their saved account card and switch instantly.
+- Individual accounts can be removed with a single click.
+
+### 2. Organization Workspace (`OrgWorkspacePage`)
+- **Kanban Board & Sprint Tracker**:
+  - Filter tasks across `All`, `To Do`, `In Progress`, `Code Review`, and `Done`.
+  - Priority levels: `Low`, `Medium`, `High`, `Urgent`.
+  - Interactive status transitions and due date tracking.
+- **Real-Time Team Chat**:
+  - Direct live streams via `org_messages` table.
+  - High-priority highlighted **Announcements** for owners and admins.
+- **Member & Role Management**:
+  - Supports role hierarchy: `OWNER`, `ADMIN`, `MD` (Managing Director), `MG` (Manager), `EMP` (Employee), `MEMBER`.
+  - Add members directly by email or share instant join codes (`DEV-XXXXX`).
+
+### 3. Profile & Avatar Editor
+- Interactive client-side image cropping and rotation before upload.
+- Extended profile attributes: `bio`, `dob`, `job_description`, `current_company`, and private `current_teams` list.
