@@ -1,284 +1,101 @@
-# DevCollab Supabase Schema
+# DevCollab Complete Supabase Schema & SQL Definitions
 
 ## Overview
-
-DevCollab uses a multi-tenant database architecture where organizations own teams, teams own projects, and projects contain tasks. Data isolation is enforced using Row Level Security (RLS) policies based on organization membership.
-
----
-
-# Profiles
-
-Stores user profile information linked to Supabase Authentication.
-
-```text
-profiles
--------------
-id uuid primary key
-full_name text not null
-avatar_url text
-created_at timestamptz not null
-updated_at timestamptz not null
-```
+This document contains the complete PostgreSQL table definitions, foreign keys, Realtime stream configurations, and RLS policies used by DevCollab.
 
 ---
 
-# Organizations
-
-Represents a company, startup, or group using DevCollab.
-
-```text
-organizations
--------------
-id uuid primary key
-name text not null
-description text
-owner_id uuid references profiles(id)
-created_at timestamptz not null
-updated_at timestamptz not null
+## 1. Profiles Table (`profiles`)
+```sql
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    full_name TEXT,
+    avatar_url TEXT,
+    bio TEXT,
+    dob DATE,
+    job_description TEXT,
+    current_company TEXT,
+    current_teams TEXT[] DEFAULT '{}',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
 ---
 
-# Organization Members
+## 2. Organizations & Members
+```sql
+CREATE TABLE IF NOT EXISTS public.organizations (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    description TEXT,
+    owner_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-Stores organization membership and roles.
-
-```text
-organization_members
--------------
-id uuid primary key
-organization_id uuid references organizations(id)
-user_id uuid references profiles(id)
-role text not null
-joined_at timestamptz not null
-```
-
-### Supported Roles
-
-```text
-owner
-admin
-member
-viewer
+CREATE TABLE IF NOT EXISTS public.organization_members (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    organization_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE,
+    role TEXT NOT NULL DEFAULT 'member', -- owner, admin, md, mg, emp, member
+    joined_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(organization_id, user_id)
+);
 ```
 
 ---
 
-# Teams
+## 3. Collaboration Modules (`projects`, `tasks`, `org_messages`, `org_invites`)
+```sql
+CREATE TABLE IF NOT EXISTS public.projects (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    description TEXT,
+    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-Represents groups within an organization.
+CREATE TABLE IF NOT EXISTS public.tasks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+    project_id UUID REFERENCES public.projects(id) ON DELETE SET NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL DEFAULT 'todo', -- todo, in_progress, code_review, done
+    priority TEXT NOT NULL DEFAULT 'medium', -- low, medium, high, urgent
+    assignee_id TEXT,
+    assignee_name TEXT,
+    assignee_avatar TEXT,
+    due_date DATE,
+    created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
-```text
-teams
--------------
-id uuid primary key
-organization_id uuid references organizations(id)
-name text not null
-description text
-created_at timestamptz not null
-updated_at timestamptz not null
+CREATE TABLE IF NOT EXISTS public.org_messages (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    user_name TEXT NOT NULL,
+    user_avatar TEXT,
+    content TEXT NOT NULL,
+    is_announcement BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.org_invites (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    org_id UUID REFERENCES public.organizations(id) ON DELETE CASCADE,
+    invite_code TEXT UNIQUE NOT NULL,
+    role TEXT NOT NULL DEFAULT 'member',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 ```
 
 ---
 
-# Team Members
-
-Stores team membership information.
-
-```text
-team_members
--------------
-id uuid primary key
-team_id uuid references teams(id)
-user_id uuid references profiles(id)
-joined_at timestamptz not null
-```
-
----
-
-# Projects
-
-Represents projects managed by teams.
-
-```text
-projects
--------------
-id uuid primary key
-organization_id uuid references organizations(id)
-team_id uuid references teams(id)
-name text not null
-description text
-status text not null
-created_by uuid references profiles(id)
-created_at timestamptz not null
-updated_at timestamptz not null
-```
-
-### Supported Statuses
-
-```text
-active
-archived
-```
-
----
-
-# Tasks
-
-Represents work items displayed on the Kanban board.
-
-```text
-tasks
--------------
-id uuid primary key
-organization_id uuid references organizations(id)
-project_id uuid references projects(id)
-title text not null
-description text
-status text not null
-priority text not null
-assignee_id uuid references profiles(id)
-created_by uuid references profiles(id)
-due_date timestamptz
-position integer
-created_at timestamptz not null
-updated_at timestamptz not null
-```
-
-### Supported Statuses
-
-```text
-todo
-in_progress
-review
-done
-```
-
-### Supported Priorities
-
-```text
-low
-medium
-high
-critical
-```
-
----
-
-# Comments
-
-Stores task discussions.
-
-```text
-comments
--------------
-id uuid primary key
-task_id uuid references tasks(id)
-user_id uuid references profiles(id)
-content text not null
-created_at timestamptz not null
-updated_at timestamptz not null
-```
-
----
-
-# Attachments
-
-Stores files uploaded to tasks.
-
-```text
-attachments
--------------
-id uuid primary key
-task_id uuid references tasks(id)
-uploaded_by uuid references profiles(id)
-file_name text not null
-file_path text not null
-file_size bigint
-uploaded_at timestamptz not null
-```
-
----
-
-# Activity Logs
-
-Tracks important user actions for auditing and collaboration.
-
-```text
-activity_logs
--------------
-id uuid primary key
-organization_id uuid references organizations(id)
-user_id uuid references profiles(id)
-entity_type text not null
-entity_id uuid not null
-action text not null
-metadata jsonb
-created_at timestamptz not null
-```
-
----
-
-# Relationships
-
-```text
-Organization
-├── Organization Members
-├── Teams
-│   ├── Team Members
-│   └── Projects
-│       └── Tasks
-│           ├── Comments
-│           ├── Attachments
-│           └── Activity Logs
-└── Activity Logs
-```
-
-```text
-User
-├── Organization Memberships
-├── Team Memberships
-├── Created Projects
-├── Assigned Tasks
-├── Comments
-└── Activity Logs
-```
-
----
-
-# Multi-Tenant Strategy
-
-Every business entity is scoped to an organization.
-
-```text
-Organization
-└── Team
-    └── Project
-        └── Task
-```
-
-This structure enables:
-
-* Organization-level data isolation
-* Row Level Security (RLS)
-* Secure multi-tenant access control
-* Efficient permission management
-
-Only users who belong to an organization may access its resources.
-
----
-
-# Future Enhancements
-
-The following entities may be introduced in later versions:
-
-* Team Chat Messages
-* Notifications
-* User Preferences
-* Activity Feed Aggregations
-* Audit Events
-* Workspace Settings
-* Project Templates
-
-```
+## 4. Realtime & Storage Configuration
+```sql
+ALTER PUBLICATION supabase_realtime ADD TABLE public.org_messages;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.tasks;
 ```

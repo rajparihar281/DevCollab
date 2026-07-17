@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:google_sign_in/google_sign_in.dart' as gsign;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
@@ -63,6 +64,34 @@ class AuthService {
     } catch (e, st) {
       log('[AuthService] signUp ERROR: $e');
       log('[AuthService] signUp STACK: $st');
+      rethrow;
+    }
+  }
+
+  Future<AuthResponse> signInWithGoogle(String webClientId) async {
+    log('[AuthService] signInWithGoogle called');
+    try {
+      await gsign.GoogleSignIn.instance.initialize(
+        serverClientId: webClientId,
+      );
+      final googleUser = await gsign.GoogleSignIn.instance.authenticate();
+      final googleAuth = googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw Exception('No ID Token found.');
+      }
+
+      final response = await _client.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
+      );
+      
+      log('[AuthService] signInWithGoogle successful');
+      return response;
+    } catch (e, st) {
+      log('[AuthService] signInWithGoogle ERROR: $e');
+      log('[AuthService] signInWithGoogle STACK: $st');
       rethrow;
     }
   }

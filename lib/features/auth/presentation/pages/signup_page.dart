@@ -159,12 +159,38 @@ class _SignupPageState extends ConsumerState<SignupPage>
 
   String _cleanErrorMessage(String raw) {
     if (raw.contains('User already registered')) {
-      return 'An account with this email already exists. Please sign in.';
+      return 'An account with this email already exists.';
     }
     if (raw.contains('Password should be at least')) {
       return 'Password must be at least 6 characters long.';
     }
     return raw.replaceAll('Exception:', '').trim();
+  }
+
+  Future<void> _signUpWithGoogle() async {
+    log('[SignupPage] Starting Google signup');
+    setState(() => _isLoading = true);
+    
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.signInWithGoogle('732760635408-d2qmcnliljqp348v1mj240bn40sdsnjm.apps.googleusercontent.com');
+      log('[SignupPage] Google signup successful');
+      if (mounted) context.go(RouteNames.organizations);
+    } catch (e) {
+      log('[SignupPage] Google sign up failed: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Google Sign-Up failed: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -615,6 +641,42 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                             ),
                                           ],
                                         ),
+                                ),
+                                const SizedBox(height: 16),
+                                // Google Sign Up Button
+                                ElevatedButton(
+                                  onPressed: _isLoading ? null : _signUpWithGoogle,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black87,
+                                    disabledBackgroundColor: Colors.grey.shade200,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(color: Colors.grey.shade300),
+                                    ),
+                                    elevation: 0,
+                                  ),
+                                  child: const Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.g_mobiledata_rounded,
+                                        size: 26,
+                                        color: Colors.black87,
+                                      ),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'Sign Up with Google',
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),

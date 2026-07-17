@@ -58,6 +58,13 @@ class AuthRepository {
     return response;
   }
 
+  Future<AuthResponse> signInWithGoogle(String webClientId) async {
+    log('[AuthRepository] signInWithGoogle called');
+    final response = await _authService.signInWithGoogle(webClientId);
+    log('[AuthRepository] signInWithGoogle completed — session: ${response.session != null}');
+    return response;
+  }
+
   Future<void> signOut() async {
     log('[AuthRepository] signOut called');
     await _authService.signOut();

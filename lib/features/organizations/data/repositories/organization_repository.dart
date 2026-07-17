@@ -1,6 +1,10 @@
 import 'dart:developer' as dev;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../domain/models/kanban_project.dart';
+import '../../domain/models/kanban_task.dart';
+import '../../domain/models/org_invite.dart';
+import '../../domain/models/org_message.dart';
 import '../../domain/models/organization.dart';
 
 class OrganizationRepository {
@@ -130,5 +134,179 @@ class OrganizationRepository {
       dev.log('[OrganizationRepository] Error deleting organization $organizationId: $e', error: e, stackTrace: st);
       rethrow;
     }
+  }
+
+  // ==========================================
+  // KANBAN BOARD: PROJECTS & TASKS
+  // ==========================================
+  Future<List<KanbanProject>> getProjects(String orgId) async {
+    final res = await _client
+        .from('projects')
+        .select()
+        .eq('org_id', orgId)
+        .order('created_at');
+    return res.map<KanbanProject>((j) => KanbanProject.fromJson(j)).toList();
+  }
+
+  Future<KanbanProject> createProject(
+      String orgId, String title, [String? description]) async {
+    final user = _client.auth.currentUser;
+    final res = await _client
+        .from('projects')
+        .insert({
+          'org_id': orgId,
+          'title': title,
+          'description': ?description,
+          'created_by': user?.id,
+        })
+        .select()
+        .single();
+    return KanbanProject.fromJson(res);
+  }
+
+  Future<List<KanbanTask>> getTasks(String orgId) async {
+    final res = await _client
+        .from('tasks')
+        .select()
+        .eq('org_id', orgId)
+        .order('created_at');
+    return res.map<KanbanTask>((j) => KanbanTask.fromJson(j)).toList();
+  }
+
+  Future<KanbanTask> createTask({
+    required String orgId,
+    String? projectId,
+    required String title,
+    String? description,
+    required String status,
+    required String priority,
+    String? assigneeId,
+    String? assigneeName,
+    String? assigneeAvatar,
+    DateTime? dueDate,
+  }) async {
+    final user = _client.auth.currentUser;
+    final res = await _client
+        .from('tasks')
+        .insert({
+          'org_id': orgId,
+          'project_id': ?projectId,
+          'title': title,
+          'description': ?description,
+          'status': status,
+          'priority': priority,
+          'assignee_id': ?assigneeId,
+          'assignee_name': ?assigneeName,
+          'assignee_avatar': ?assigneeAvatar,
+          'due_date': ?(dueDate?.toIso8601String().substring(0, 10)),
+          'created_by': user?.id,
+        })
+        .select()
+        .single();
+    return KanbanTask.fromJson(res);
+  }
+
+  Future<void> updateTaskStatus(String taskId, String newStatus) async {
+    await _client.from('tasks').update({'status': newStatus}).eq('id', taskId);
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    await _client.from('tasks').delete().eq('id', taskId);
+  }
+
+  // ==========================================
+  // REAL-TIME TEAM CHAT & ANNOUNCEMENTS
+  // ==========================================
+  Stream<List<OrgMessage>> getMessagesStream(String orgId) {
+    return _client
+        .from('org_messages')
+        .stream(primaryKey: ['id'])
+        .eq('org_id', orgId)
+        .order('created_at')
+        .map((rows) => rows.map<OrgMessage>((r) => OrgMessage.fromJson(r)).toList());
+  }
+
+  Future<OrgMessage> sendMessage({
+    required String orgId,
+    required String content,
+    bool isAnnouncement = false,
+  }) async {
+    final user = _client.auth.currentUser;
+    final res = await _client
+        .from('org_messages')
+        .insert({
+          'org_id': orgId,
+          'user_id': user?.id,
+          'user_name': user?.userMetadata?['full_name'] ??
+              user?.email?.split('@').first ??
+              'Developer',
+          'content': content,
+          'is_announcement': isAnnouncement,
+        })
+        .select()
+        .single();
+    return OrgMessage.fromJson(res);
+  }
+
+  // ==========================================
+  // INVITES & JOIN CODES
+  // ==========================================
+  Future<OrgInvite> createInviteCode({
+    required String orgId,
+    required String inviteCode,
+    String role = 'member',
+  }) async {
+    final user = _client.auth.currentUser;
+    final res = await _client
+        .from('org_invites')
+        .insert({
+          'org_id': orgId,
+          'invite_code': inviteCode,
+          'role': role,
+          'created_by': user?.id,
+        })
+        .select()
+        .single();
+    return OrgInvite.fromJson(res);
+  }
+
+  Future<List<OrgInvite>> getInvites(String orgId) async {
+    final res = await _client
+        .from('org_invites')
+        .select()
+        .eq('org_id', orgId)
+        .order('created_at', ascending: false);
+    return res.map<OrgInvite>((j) => OrgInvite.fromJson(j)).toList();
+  }
+
+  Future<String> joinOrgWithCode(String code) async {
+    final user = _client.auth.currentUser;
+    if (user == null) throw Exception('Must be logged in to join');
+
+    final inviteRow = await _client
+        .from('org_invites')
+        .select()
+        .eq('invite_code', code.trim().toUpperCase())
+        .maybeSingle();
+
+    if (inviteRow == null) {
+      throw Exception('Invalid invite code "$code". Please verify with your team leader.');
+    }
+
+    final orgId = inviteRow['org_id'] as String;
+    final role = inviteRow['role'] as String? ?? 'member';
+
+    // Insert into organization_members
+    await _client.from('organization_members').upsert({
+      'organization_id': orgId,
+      'user_id': user.id,
+      'role': role,
+    });
+
+    return orgId;
+  }
+
+  Future<void> deleteInviteCode(String inviteId) async {
+    await _client.from('org_invites').delete().eq('id', inviteId);
   }
 }
