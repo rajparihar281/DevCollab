@@ -42,11 +42,11 @@ class OrganizationCard extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    organization.name[0].toUpperCase(),
+                    _getInitials(organization.name),
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
-                      fontSize: 22,
+                      fontSize: 20,
                     ),
                   ),
                 ),
@@ -104,5 +104,17 @@ class OrganizationCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getInitials(String name) {
+    if (name.trim().isEmpty) return '?';
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.length > 1) {
+      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+    }
+    if (name.length > 1) {
+      return name.substring(0, 2).toUpperCase();
+    }
+    return name[0].toUpperCase();
   }
 }

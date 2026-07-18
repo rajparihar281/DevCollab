@@ -13,6 +13,7 @@ import '../../../../shared/widgets/empty_state.dart';
 import '../providers/organization_providers.dart';
 import '../../../../routing/route_names.dart';
 import '../../../../features/auth/presentation/providers/auth_provider.dart';
+import '../../../../features/notifications/data/repositories/notifications_repository.dart' as dev_collab_notifs;
 import '../widgets/organization_card.dart';
 
 class OrganizationsPage extends ConsumerStatefulWidget {
@@ -144,6 +145,45 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
           ],
         ),
         actions: [
+          Consumer(
+            builder: (context, ref, child) {
+              final notifsAsync = ref.watch(dev_collab_notifs.notificationsStreamProvider);
+              final unreadCount = notifsAsync.maybeWhen(
+                data: (notifs) => notifs.where((n) => !n.isRead).length,
+                orElse: () => 0,
+              );
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'Notifications',
+                    onPressed: () => _showNotificationsSheet(context, ref),
+                  ),
+                  if (unreadCount > 0)
+                    Positioned(
+                      right: 8,
+                      top: 8,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(
+                          unreadCount > 9 ? '9+' : unreadCount.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.vpn_key_rounded),
             tooltip: 'Join with Invite Code',
@@ -188,26 +228,46 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
                   padding: const EdgeInsets.all(16),
                   itemCount: orgs.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (_, i) => OrganizationCard(
-                    organization: orgs[i],
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => OrgWorkspacePage(organization: orgs[i]),
+                  itemBuilder: (_, i) {
+                    final org = orgs[i];
+                    final isOwner = org.ownerId == ref.read(authRepositoryProvider).currentUser?.id;
+                    return Dismissible(
+                      key: ValueKey(org.id),
+                      direction: isOwner ? DismissDirection.endToStart : DismissDirection.none,
+                      confirmDismiss: (_) => _confirmDelete(context),
+                      onDismissed: (_) {
+                        ref.read(organizationsProvider.notifier).deleteOrganization(org.id);
+                      },
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.delete_rounded, color: Colors.white),
                       ),
-                    ),
-                    onDelete: orgs[i].ownerId ==
-                            ref.read(authRepositoryProvider).currentUser?.id
-                        ? () async {
-                            final confirmed = await _confirmDelete(context);
-                            if (confirmed) {
-                              await ref
-                                  .read(organizationsProvider.notifier)
-                                  .deleteOrganization(orgs[i].id);
-                            }
-                          }
-                        : null,
-                  ),
+                      child: OrganizationCard(
+                        organization: org,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => OrgWorkspacePage(organization: org),
+                          ),
+                        ),
+                        onDelete: isOwner
+                            ? () async {
+                                final confirmed = await _confirmDelete(context);
+                                if (confirmed) {
+                                  await ref
+                                      .read(organizationsProvider.notifier)
+                                      .deleteOrganization(org.id);
+                                }
+                              }
+                            : null,
+                      ),
+                    );
+                  },
                 ),
               ),
       ),
@@ -307,5 +367,87 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
           ),
         ) ??
         false;
+  }
+
+  void _showNotificationsSheet(BuildContext context, WidgetRef ref) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.6,
+          maxChildSize: 0.9,
+          builder: (_, scrollController) {
+            final notifsAsync = ref.watch(dev_collab_notifs.notificationsStreamProvider);
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      const Text(
+                        'Notifications',
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(dev_collab_notifs.notificationsRepositoryProvider).markAllAsRead();
+                        },
+                        child: const Text('Mark all as read'),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: notifsAsync.when(
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) => Center(child: Text('Error: $e')),
+                    data: (notifs) {
+                      if (notifs.isEmpty) {
+                        return const Center(child: Text('No notifications yet.'));
+                      }
+                      return ListView.builder(
+                        controller: scrollController,
+                        itemCount: notifs.length,
+                        itemBuilder: (context, index) {
+                          final n = notifs[index];
+                          return ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor: n.isRead ? Colors.grey.withValues(alpha: 0.2) : Colors.blue.withValues(alpha: 0.2),
+                              child: Icon(
+                                n.type == 'task_assigned' ? Icons.assignment_turned_in : Icons.notifications,
+                                color: n.isRead ? Colors.grey : Colors.blue,
+                              ),
+                            ),
+                            title: Text(n.title, style: TextStyle(fontWeight: n.isRead ? FontWeight.normal : FontWeight.bold)),
+                            subtitle: Text(n.message),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete_outline, size: 20),
+                              onPressed: () {
+                                ref.read(dev_collab_notifs.notificationsRepositoryProvider).deleteNotification(n.id);
+                              },
+                            ),
+                            onTap: () {
+                              if (!n.isRead) {
+                                ref.read(dev_collab_notifs.notificationsRepositoryProvider).markAsRead(n.id);
+                              }
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

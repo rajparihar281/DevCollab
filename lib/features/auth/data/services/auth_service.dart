@@ -146,6 +146,19 @@ class AuthService {
 
     try {
       await _client.auth.signOut();
+      
+      // Clear Google Sign-In state to prevent auto-login of the same user
+      try {
+        await gsign.GoogleSignIn.instance.disconnect();
+      } catch (_) {
+        // ignore if not connected
+      }
+      try {
+        await gsign.GoogleSignIn.instance.signOut();
+      } catch (_) {
+        // ignore
+      }
+      
       log('[AuthService] signOut successful');
     } catch (e, st) {
       log('[AuthService] signOut ERROR: $e');

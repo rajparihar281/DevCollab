@@ -7,12 +7,16 @@ import 'package:dev_collab/features/organizations/domain/models/organization.dar
 import 'package:dev_collab/features/organizations/domain/models/organization_member.dart';
 import 'package:dev_collab/features/organizations/presentation/providers/organization_providers.dart';
 import 'package:dev_collab/features/organizations/presentation/widgets/add_organization_member_dialog.dart';
+import 'package:dev_collab/features/teams/presentation/providers/team_providers.dart';
+import 'package:dev_collab/features/teams/presentation/widgets/team_card.dart';
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:dev_collab/shared/widgets/empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:dev_collab/routing/route_names.dart';
 
 class OrgWorkspacePage extends ConsumerStatefulWidget {
   const OrgWorkspacePage({required this.organization, super.key});
@@ -49,6 +53,7 @@ class _OrgWorkspacePageState extends ConsumerState<OrgWorkspacePage> {
         children: [
           _KanbanBoardTab(orgId: org.id),
           _TeamChatTab(orgId: org.id),
+          _TeamsTab(orgId: org.id),
           _TeamMembersAndInvitesTab(organization: org),
         ],
       ),
@@ -59,19 +64,67 @@ class _OrgWorkspacePageState extends ConsumerState<OrgWorkspacePage> {
           NavigationDestination(
             icon: Icon(Icons.view_kanban_outlined),
             selectedIcon: Icon(Icons.view_kanban_rounded),
-            label: 'Kanban Board',
+            label: 'Kanban',
           ),
           NavigationDestination(
             icon: Icon(Icons.chat_bubble_outline_rounded),
             selectedIcon: Icon(Icons.chat_bubble_rounded),
-            label: 'Team Chat',
+            label: 'Chat',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.groups_outlined),
+            selectedIcon: Icon(Icons.groups_rounded),
+            label: 'Teams',
           ),
           NavigationDestination(
             icon: Icon(Icons.people_outline_rounded),
             selectedIcon: Icon(Icons.people_rounded),
-            label: 'Members & Invites',
+            label: 'Members',
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TeamsTab extends ConsumerWidget {
+  const _TeamsTab({required this.orgId});
+  final String orgId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final teamsAsync = ref.watch(teamsProvider(orgId));
+
+    return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'create_team_fab',
+        onPressed: () => context.push(RouteNames.createTeamPath(orgId)),
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('New Team'),
+      ),
+      body: teamsAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text(e.toString())),
+        data: (teams) => teams.isEmpty
+            ? EmptyState(
+                icon: Icons.groups_rounded,
+                title: 'No teams yet',
+                subtitle: 'Create a team to organize work.',
+                action: () => context.push(RouteNames.createTeamPath(orgId)),
+                actionLabel: 'Create Team',
+              )
+            : RefreshIndicator(
+                onRefresh: () => ref.read(teamsProvider(orgId).notifier).refresh(),
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
+                  itemCount: teams.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  itemBuilder: (_, i) => TeamCard(
+                    team: teams[i],
+                    onTap: () => context.push(RouteNames.teamDetailPath(orgId, teams[i].id)),
+                  ),
+                ),
+              ),
       ),
     );
   }
@@ -313,6 +366,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
   void _showCreateTaskModal() {
     final titleCtrl = TextEditingController();
     final descCtrl = TextEditingController();
+    final assigneeCtrl = TextEditingController();
     String status = 'todo';
     String priority = 'medium';
     DateTime? dueDate;
@@ -386,6 +440,14 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   ),
                 ],
               ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: assigneeCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Assign to (User, Team, or "All")',
+                  hintText: 'e.g. Design Team, John, or All',
+                ),
+              ),
               const SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -416,6 +478,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                           description: descCtrl.text.trim(),
                           status: status,
                           priority: priority,
+                          assigneeName: assigneeCtrl.text.trim().isNotEmpty ? assigneeCtrl.text.trim() : null,
                           dueDate: dueDate,
                         );
                     ref.invalidate(orgTasksProvider(widget.orgId));
