@@ -183,6 +183,8 @@ class OrganizationRepository {
     String? assigneeId,
     String? assigneeName,
     String? assigneeAvatar,
+    List<String>? assigneeUserIds,
+    List<String>? assigneeTeamIds,
     DateTime? dueDate,
   }) async {
     final user = _client.auth.currentUser;
@@ -203,7 +205,30 @@ class OrganizationRepository {
         })
         .select()
         .single();
-    return KanbanTask.fromJson(res);
+    
+    final task = KanbanTask.fromJson(res);
+
+    // Insert multiple assignees if provided
+    if (assigneeUserIds != null || assigneeTeamIds != null) {
+      final List<Map<String, dynamic>> assigneesToInsert = [];
+      if (assigneeUserIds != null) {
+        for (var uid in assigneeUserIds) {
+          assigneesToInsert.add({'task_id': task.id, 'user_id': uid});
+        }
+      }
+      if (assigneeTeamIds != null) {
+        for (var tid in assigneeTeamIds) {
+          assigneesToInsert.add({'task_id': task.id, 'team_id': tid});
+        }
+      }
+      if (assigneesToInsert.isNotEmpty) {
+        try {
+          await _client.from('task_assignees').insert(assigneesToInsert);
+        } catch (_) {} // Ignore if table doesn't exist yet
+      }
+    }
+
+    return task;
   }
 
   Future<void> updateTaskStatus(String taskId, String newStatus) async {
