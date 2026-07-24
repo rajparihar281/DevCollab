@@ -17,35 +17,12 @@ class SplashPage extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             // Logo Image Placeholder — can be replaced with Image.asset('assets/logo.png') later
-            Container(
+            Image.asset(
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/images/dark_mode_icon.png'
+                  : 'assets/images/light_mode_icon.png',
               width: 100,
               height: 100,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.primary,
-                    AppColors.secondary.withValues(alpha: 0.85),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(28),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.4),
-                    blurRadius: 28,
-                    offset: const Offset(0, 12),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Icon(
-                  Icons.hub_rounded,
-                  size: 54,
-                  color: Colors.white,
-                ),
-              ),
             ),
             const SizedBox(height: 28),
             const Text(
