@@ -78,6 +78,7 @@ class AuthService {
       final googleAuth = googleUser.authentication;
       final idToken = googleAuth.idToken;
 
+
       if (idToken == null) {
         throw Exception('No ID Token found.');
       }
