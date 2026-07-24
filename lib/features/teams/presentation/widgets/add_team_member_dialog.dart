@@ -453,7 +453,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                         : _handleSubmit,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.onPrimary,
                       disabledBackgroundColor:
                           AppColors.primary.withValues(alpha:0.3),
                       padding: const EdgeInsets.symmetric(
