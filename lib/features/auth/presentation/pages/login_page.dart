@@ -215,32 +215,12 @@ class _LoginPageState extends ConsumerState<LoginPage>
                       children: [
                         // Brand Logo Banner
                         Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary,
-                                  AppColors.secondary.withValues(alpha: 0.8),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.primary
-                                      .withValues(alpha: 0.35),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.hub_rounded,
-                              size: 40,
-                              color: Colors.white,
-                            ),
+                          child: Image.asset(
+                            Theme.of(context).brightness == Brightness.dark
+                                ? 'assets/images/dark_mode_icon.png'
+                                : 'assets/images/light_mode_icon.png',
+                            width: 80,
+                            height: 80,
                           ),
                         ),
                         const SizedBox(height: 24),
@@ -475,7 +455,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                   onPressed: _isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primary,
-                                    foregroundColor: Colors.white,
+                                    foregroundColor: AppColors.onPrimary,
                                     disabledBackgroundColor: AppColors.primary
                                         .withValues(alpha: 0.4),
                                     padding: const EdgeInsets.symmetric(
@@ -491,7 +471,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                           width: 22,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.5,
-                                            color: Colors.white,
+                                            color: AppColors.onPrimary,
                                           ),
                                         )
                                       : const Row(

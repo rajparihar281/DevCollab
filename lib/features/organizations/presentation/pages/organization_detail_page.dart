@@ -209,7 +209,7 @@ class _MembersTab extends ConsumerWidget {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.onPrimary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
@@ -490,7 +490,7 @@ class _MemberCard extends StatelessWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             child: const Text('Remove'),
           ),

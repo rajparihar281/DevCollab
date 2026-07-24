@@ -4,10 +4,10 @@ import 'package:google_fonts/google_fonts.dart';
 class AppTheme {
   const AppTheme._();
 
-  // Vibrant Premium Accents
-  static const _primaryColor = Color(0xFF6C63FF);
-  static const _secondaryColor = Color(0xFF00E5FF);
-  static const _errorColor = Color(0xFFFF4B6E);
+  // Monochrome Accents
+  static const _primaryColor = Color(0xFF000000);
+  static const _secondaryColor = Color(0xFF333333);
+  static const _errorColor = Color(0xFF000000);
 
   // Pure OLED Monochromatic Colors (#000000 background & #FFFFFF accents)
   static const _oledBackground = Color(0xFF000000);

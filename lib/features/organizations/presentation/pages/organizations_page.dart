@@ -138,7 +138,12 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.hub_rounded, size: 18, color: Colors.white),
+              child:Image.asset(
+  Theme.of(context).brightness == Brightness.dark
+      ? 'assets/images/dark_mode_icon.png'
+      : 'assets/images/light_mode_icon.png',
+  width: 50,
+)
             ),
             const SizedBox(width: 12),
             const Text('DevCollab'),

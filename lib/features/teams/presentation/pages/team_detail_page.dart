@@ -205,7 +205,7 @@ class _MembersTab extends ConsumerWidget {
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: AppColors.onPrimary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
@@ -369,7 +369,7 @@ class _MembersTab extends ConsumerWidget {
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
+              foregroundColor: AppColors.onPrimary,
             ),
             child: const Text('Remove'),
           ),
@@ -540,7 +540,7 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
                   onPressed: _sending ? null : _send,
                   style: IconButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
+                    foregroundColor: AppColors.onPrimary,
                     padding: const EdgeInsets.all(12),
                   ),
                   icon: _sending
