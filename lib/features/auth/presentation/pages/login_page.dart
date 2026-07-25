@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/features/auth/domain/models/saved_account.dart';
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
@@ -34,7 +33,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: Duration(milliseconds: 800),
     );
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
@@ -63,7 +62,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    log('[LoginPage] Starting login for: $email');
+
     setState(() => _isLoading = true);
 
     try {
@@ -87,26 +86,26 @@ class _LoginPageState extends ConsumerState<LoginPage>
         password: password,
       );
 
-      log('[LoginPage] Login successful');
+
       // AuthGate / Router redirect handles navigation reactively
     } catch (e) {
-      log('[LoginPage] Login error: $e');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.white),
-                const SizedBox(width: 12),
+                Icon(Icons.error_outline_rounded, color: Colors.white),
+                SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Login failed: ${_cleanErrorMessage(e.toString())}',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -133,21 +132,21 @@ class _LoginPageState extends ConsumerState<LoginPage>
   }
 
   Future<void> _loginWithGoogle() async {
-    log('[LoginPage] Starting Google login');
+
     setState(() => _isLoading = true);
     
     try {
       final repository = ref.read(authRepositoryProvider);
       await repository.signInWithGoogle('732760635408-d2qmcnliljqp348v1mj240bn40sdsnjm.apps.googleusercontent.com');
-      log('[LoginPage] Google login successful');
+
       if (mounted) context.go(RouteNames.organizations);
     } catch (e) {
-      log('[LoginPage] Google login failed: $e');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Google Sign-In failed: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
           ),
         );
       }
@@ -161,7 +160,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colorBackground,
       body: Stack(
         children: [
           // Background Gradient Orbs for premium visual aesthetic
@@ -175,7 +174,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.18),
+                    context.colorPrimary.withValues(alpha: 0.18),
                     Colors.transparent,
                   ],
                 ),
@@ -192,7 +191,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary.withValues(alpha: 0.15),
+                    context.colorSecondary.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -208,7 +207,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Container(
-                    constraints: const BoxConstraints(maxWidth: 440),
+                    constraints: BoxConstraints(maxWidth: 440),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -223,46 +222,46 @@ class _LoginPageState extends ConsumerState<LoginPage>
                             height: 80,
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
 
                         // Title & Subtitle
-                        const Text(
+                        Text(
                           'Welcome back',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colorTextPrimary,
                             letterSpacing: -0.5,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Sign in to your DevCollab workspace to continue building.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: context.colorTextSecondary,
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 36),
+                        SizedBox(height: 36),
 
                         // Glassmorphic Form Card
                         Container(
                           padding: const EdgeInsets.all(28),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: context.colorSurface,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: AppColors.border.withValues(alpha: 0.6),
+                              color: context.colorBorder.withValues(alpha: 0.6),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 24,
-                                offset: const Offset(0, 12),
+                                offset: Offset(0, 12),
                               ),
                             ],
                           ),
@@ -275,56 +274,56 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                   onSelectAccount: _onSelectSavedAccount,
                                 ),
                                 // Email Field
-                                const Text(
+                                Text(
                                   'Email Address',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: context.colorTextPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 TextFormField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   textInputAction: TextInputAction.next,
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: context.colorTextPrimary,
                                     fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'name@company.com',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.textMuted,
+                                    hintStyle: TextStyle(
+                                      color: context.colorTextMuted,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.mail_outline_rounded,
-                                      color: AppColors.textSecondary,
+                                      color: context.colorTextSecondary,
                                       size: 20,
                                     ),
                                     filled: true,
-                                    fillColor: AppColors.background,
+                                    fillColor: context.colorBackground,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
+                                      borderSide: BorderSide(
+                                        color: context.colorPrimary,
                                         width: 1.5,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.error),
+                                      borderSide: BorderSide(
+                                          color: context.colorError),
                                     ),
                                     contentPadding:
                                         const EdgeInsets.symmetric(
@@ -343,19 +342,19 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
 
                                 // Password Field
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    const Text(
+                                    Text(
                                       'Password',
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
-                                        color: AppColors.textPrimary,
+                                        color: context.colorTextPrimary,
                                       ),
                                     ),
                                     TextButton(
@@ -367,35 +366,35 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                         tapTargetSize:
                                             MaterialTapTargetSize.shrinkWrap,
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'Forgot?',
                                         style: TextStyle(
                                           fontSize: 12,
-                                          color: AppColors.primary,
+                                          color: context.colorPrimary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 TextFormField(
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   textInputAction: TextInputAction.done,
                                   onFieldSubmitted: (_) => _login(),
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: context.colorTextPrimary,
                                     fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: '••••••••',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.textMuted,
+                                    hintStyle: TextStyle(
+                                      color: context.colorTextMuted,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.lock_outline_rounded,
-                                      color: AppColors.textSecondary,
+                                      color: context.colorTextSecondary,
                                       size: 20,
                                     ),
                                     suffixIcon: IconButton(
@@ -403,7 +402,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                         _obscurePassword
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: AppColors.textSecondary,
+                                        color: context.colorTextSecondary,
                                         size: 20,
                                       ),
                                       onPressed: () {
@@ -412,28 +411,28 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                       },
                                     ),
                                     filled: true,
-                                    fillColor: AppColors.background,
+                                    fillColor: context.colorBackground,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
+                                      borderSide: BorderSide(
+                                        color: context.colorPrimary,
                                         width: 1.5,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.error),
+                                      borderSide: BorderSide(
+                                          color: context.colorError),
                                     ),
                                     contentPadding:
                                         const EdgeInsets.symmetric(
@@ -448,15 +447,15 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 28),
+                                SizedBox(height: 28),
 
                                 // Login Button
                                 ElevatedButton(
                                   onPressed: _isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: AppColors.onPrimary,
-                                    disabledBackgroundColor: AppColors.primary
+                                    backgroundColor: context.colorPrimary,
+                                    foregroundColor: context.colorOnPrimary,
+                                    disabledBackgroundColor: context.colorPrimary
                                         .withValues(alpha: 0.4),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
@@ -466,15 +465,15 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                     elevation: 0,
                                   ),
                                   child: _isLoading
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           height: 22,
                                           width: 22,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.5,
-                                            color: AppColors.onPrimary,
+                                            color: context.colorOnPrimary,
                                           ),
                                         )
-                                      : const Row(
+                                      : Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
@@ -493,7 +492,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                           ],
                                         ),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 // Google Sign In Button
                                 ElevatedButton(
                                   onPressed: _isLoading ? null : _loginWithGoogle,
@@ -509,7 +508,7 @@ class _LoginPageState extends ConsumerState<LoginPage>
                                     ),
                                     elevation: 0,
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.center,
                                     children: [
@@ -533,25 +532,25 @@ class _LoginPageState extends ConsumerState<LoginPage>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
 
                         // Switch to Signup
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               "Don't have an account?",
                               style: TextStyle(
-                                color: AppColors.textSecondary,
+                                color: context.colorTextSecondary,
                                 fontSize: 14,
                               ),
                             ),
                             TextButton(
                               onPressed: () => context.push(RouteNames.signup),
-                              child: const Text(
+                              child: Text(
                                 'Create Account',
                                 style: TextStyle(
-                                  color: AppColors.primary,
+                                  color: context.colorPrimary,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),

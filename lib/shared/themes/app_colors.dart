@@ -1,21 +1,19 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
-  const AppColors._();
+extension AppColorsExt on BuildContext {
+  Color get colorPrimary => Theme.of(this).colorScheme.primary;
+  Color get colorOnPrimary => Theme.of(this).colorScheme.onPrimary;
+  Color get colorSecondary => Theme.of(this).colorScheme.secondary;
+  Color get colorError => Theme.of(this).colorScheme.error;
+  Color get colorSuccess => const Color(0xFF22C55E);
+  Color get colorWarning => const Color(0xFFF59E0B);
 
-  static const Color primary = Color(0xFFFFFFFF);
-  static const Color onPrimary = Color(0xFF000000);
-  static const Color secondary = Color(0xFFCCCCCC);
-  static const Color error = Color(0xFFFFFFFF);
-  static const Color success = Color(0xFFFFFFFF);
-  static const Color warning = Color(0xFFFFFFFF);
+  Color get colorBackground => Theme.of(this).scaffoldBackgroundColor;
+  Color get colorSurface => Theme.of(this).colorScheme.surface;
+  Color get colorSurfaceLight => Theme.of(this).colorScheme.surfaceContainerHighest;
+  Color get colorBorder => Theme.of(this).dividerTheme.color ?? const Color(0xFF262626);
 
-  static const Color background = Color(0xFF000000);
-  static const Color surface = Color(0xFF0A0A0A);
-  static const Color surfaceLight = Color(0xFF141414);
-  static const Color border = Color(0xFF262626);
-
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFAAAAAA);
-  static const Color textMuted = Color(0xFF666666);
+  Color get colorTextPrimary => Theme.of(this).colorScheme.onSurface;
+  Color get colorTextSecondary => Theme.of(this).colorScheme.onSurface.withValues(alpha: 0.7);
+  Color get colorTextMuted => Theme.of(this).colorScheme.onSurface.withValues(alpha: 0.5);
 }

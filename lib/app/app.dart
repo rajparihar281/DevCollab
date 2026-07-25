@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,7 +14,7 @@ import '../shared/themes/theme_provider.dart';
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(authNotifierProvider);
   final hasSeenOnboarding = ref.watch(onboardingProvider);
-  log('[appRouterProvider] Creating GoRouter with AuthNotifier & onboarding state=$hasSeenOnboarding');
+
   return createAppRouter(authNotifier, hasSeenOnboarding);
 });
 
@@ -27,7 +26,7 @@ class DevCollabApp extends ConsumerWidget {
     final router = ref.watch(appRouterProvider);
     final themeMode = ref.watch(themeModeProvider);
 
-    log('[DevCollabApp] build() called with themeMode: $themeMode');
+
 
     return MaterialApp.router(
       title: 'DevCollab',

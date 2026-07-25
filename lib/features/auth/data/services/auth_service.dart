@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:google_sign_in/google_sign_in.dart' as gsign;
@@ -19,7 +18,7 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    log('[AuthService] signIn called with email: $email');
+
 
     try {
       final response = await _client.auth.signInWithPassword(
@@ -27,15 +26,15 @@ class AuthService {
         password: password,
       );
 
-      log('[AuthService] signIn response received');
-      log('[AuthService] session: ${response.session != null ? "EXISTS" : "NULL"}');
-      log('[AuthService] user: ${response.user?.email ?? "NULL"}');
-      log('[AuthService] accessToken: ${response.session?.accessToken != null ? "EXISTS (${response.session!.accessToken.length} chars)" : "NULL"}');
+
+
+
+
 
       return response;
-    } catch (e, st) {
-      log('[AuthService] signIn ERROR: $e');
-      log('[AuthService] signIn STACK: $st');
+    } catch (e) {
+
+
       rethrow;
     }
   }
@@ -45,7 +44,7 @@ class AuthService {
     required String password,
     String? fullName,
   }) async {
-    log('[AuthService] signUp called with email: $email, fullName: $fullName');
+
 
     try {
       final response = await _client.auth.signUp(
@@ -56,20 +55,20 @@ class AuthService {
             : null,
       );
 
-      log('[AuthService] signUp response received');
-      log('[AuthService] session: ${response.session != null ? "EXISTS" : "NULL"}');
-      log('[AuthService] user: ${response.user?.email ?? "NULL"}');
+
+
+
 
       return response;
-    } catch (e, st) {
-      log('[AuthService] signUp ERROR: $e');
-      log('[AuthService] signUp STACK: $st');
+    } catch (e) {
+
+
       rethrow;
     }
   }
 
   Future<AuthResponse> signInWithGoogle(String webClientId) async {
-    log('[AuthService] signInWithGoogle called');
+
     try {
       await gsign.GoogleSignIn.instance.initialize(
         serverClientId: webClientId,
@@ -88,11 +87,11 @@ class AuthService {
         idToken: idToken,
       );
       
-      log('[AuthService] signInWithGoogle successful');
+
       return response;
-    } catch (e, st) {
-      log('[AuthService] signInWithGoogle ERROR: $e');
-      log('[AuthService] signInWithGoogle STACK: $st');
+    } catch (e) {
+
+
       rethrow;
     }
   }
@@ -106,7 +105,7 @@ class AuthService {
           .maybeSingle();
       return data;
     } catch (e) {
-      log('[AuthService] getProfile error: $e');
+
       return null;
     }
   }
@@ -127,7 +126,7 @@ class AuthService {
             fileOptions: const FileOptions(upsert: true),
           );
     } catch (e) {
-      log('[AuthService] error uploading to "$bucketName": $e');
+
       final errStr = e.toString();
       if (errStr.contains('403') ||
           errStr.contains('row-level security') ||
@@ -143,7 +142,7 @@ class AuthService {
   }
 
   Future<void> signOut() async {
-    log('[AuthService] signOut called');
+
 
     try {
       await _client.auth.signOut();
@@ -151,19 +150,15 @@ class AuthService {
       // Clear Google Sign-In state to prevent auto-login of the same user
       try {
         await gsign.GoogleSignIn.instance.disconnect();
-      } catch (_) {
-        // ignore if not connected
-      }
+      } catch (_) {}
       try {
         await gsign.GoogleSignIn.instance.signOut();
-      } catch (_) {
-        // ignore
-      }
+      } catch (_) {}
       
-      log('[AuthService] signOut successful');
-    } catch (e, st) {
-      log('[AuthService] signOut ERROR: $e');
-      log('[AuthService] signOut STACK: $st');
+
+    } catch (e) {
+
+
       rethrow;
     }
   }

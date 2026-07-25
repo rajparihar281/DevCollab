@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -35,7 +34,7 @@ GoRouter createAppRouter(AuthNotifier authNotifier, bool hasSeenOnboarding) {
       final hasSession = authNotifier.session != null;
       final currentPath = state.matchedLocation;
 
-      log('[GoRouter redirect] path=$currentPath, initialized=$isInitialized, hasSession=$hasSession, onboarding=$hasSeenOnboarding');
+
 
       if (!isInitialized) {
         return currentPath == RouteNames.splash ? null : RouteNames.splash;

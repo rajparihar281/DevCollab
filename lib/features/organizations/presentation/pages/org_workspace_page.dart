@@ -40,8 +40,8 @@ class _OrgWorkspacePageState extends ConsumerState<OrgWorkspacePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(org.name,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            const Text(
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(
               'Team Workspace',
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
@@ -60,7 +60,7 @@ class _OrgWorkspacePageState extends ConsumerState<OrgWorkspacePage> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (idx) => setState(() => _currentIndex = idx),
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.view_kanban_outlined),
             selectedIcon: Icon(Icons.view_kanban_rounded),
@@ -99,11 +99,11 @@ class _TeamsTab extends ConsumerWidget {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'create_team_fab',
         onPressed: () => context.push(RouteNames.createTeamPath(orgId)),
-        icon: const Icon(Icons.add_rounded),
-        label: const Text('New Team'),
+        icon: Icon(Icons.add_rounded),
+        label: Text('New Team'),
       ),
       body: teamsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text(e.toString())),
         data: (teams) => teams.isEmpty
             ? EmptyState(
@@ -118,7 +118,7 @@ class _TeamsTab extends ConsumerWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                   itemCount: teams.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
+                  separatorBuilder: (_, _) => SizedBox(height: 12),
                   itemBuilder: (_, i) => TeamCard(
                     team: teams[i],
                     onTap: () => context.push(RouteNames.teamDetailPath(orgId, teams[i].id)),
@@ -152,8 +152,8 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'fab_kanban_new_task',
         onPressed: _showCreateTaskModal,
-        icon: const Icon(Icons.add_task_rounded),
-        label: const Text('New Task'),
+        icon: Icon(Icons.add_task_rounded),
+        label: Text('New Task'),
       ),
       body: Column(
         children: [
@@ -175,7 +175,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
           // Tasks List
           Expanded(
             child: tasksAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error loading tasks: $e')),
               data: (tasks) {
                 final filtered = _selectedFilter == 'All'
@@ -199,7 +199,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   child: ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 80),
                     itemCount: filtered.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => SizedBox(height: 12),
                     itemBuilder: (ctx, i) => _buildTaskCard(filtered[i]),
                   ),
                 );
@@ -226,9 +226,9 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
   Widget _buildTaskCard(KanbanTask task) {
     final theme = Theme.of(context);
     Color priorityColor = Colors.grey;
-    if (task.priority == 'urgent') priorityColor = AppColors.error;
+    if (task.priority == 'urgent') priorityColor = context.colorError;
     if (task.priority == 'high') priorityColor = Colors.orange;
-    if (task.priority == 'medium') priorityColor = AppColors.primary;
+    if (task.priority == 'medium') priorityColor = context.colorPrimary;
 
     String statusLabel = 'To Do';
     if (task.status == 'in_progress') statusLabel = 'In Progress';
@@ -262,7 +262,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -272,42 +272,42 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                 child: Text(
                   statusLabel,
                   style:
-                      const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                      TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
                 ),
               ),
-              const Spacer(),
+              Spacer(),
               IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                color: AppColors.error,
+                icon: Icon(Icons.delete_outline_rounded, size: 18),
+                color: context.colorError,
                 onPressed: () => _deleteTask(task.id),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             task.title,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           if (task.description != null && task.description!.isNotEmpty) ...[
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Text(
               task.description!,
               style: TextStyle(
                   fontSize: 13, color: theme.textTheme.bodySmall?.color),
             ),
           ],
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Row(
             children: [
               if (task.dueDate != null) ...[
-                const Icon(Icons.calendar_today_rounded,
+                Icon(Icons.calendar_today_rounded,
                     size: 14, color: Colors.grey),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Text(
                   DateFormat.yMMMd().format(task.dueDate!),
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: TextStyle(fontSize: 12, color: Colors.grey),
                 ),
-                const Spacer(),
+                Spacer(),
               ],
               PopupMenuButton<String>(
                 onSelected: (newStatus) => _changeStatus(task.id, newStatus),
@@ -321,21 +321,21 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Text(
+                      Text(
                         'Move Status',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primary,
+                          color: context.colorPrimary,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 4),
                       Icon(Icons.swap_horiz_rounded,
                           size: 16, color: theme.colorScheme.primary),
                     ],
                   ),
                 ),
-                itemBuilder: (_) => const [
+                itemBuilder: (_) => [
                   PopupMenuItem(value: 'todo', child: Text('To Do')),
                   PopupMenuItem(
                       value: 'in_progress', child: Text('In Progress')),
@@ -374,7 +374,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => StatefulBuilder(
@@ -389,29 +389,29 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Create Sprint Task',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               TextField(
                 controller: titleCtrl,
-                decoration: const InputDecoration(labelText: 'Task Title'),
+                decoration: InputDecoration(labelText: 'Task Title'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: descCtrl,
                 decoration:
-                    const InputDecoration(labelText: 'Description (Optional)'),
+                    InputDecoration(labelText: 'Description (Optional)'),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: priority,
-                      decoration: const InputDecoration(labelText: 'Priority'),
-                      items: const [
+                      decoration: InputDecoration(labelText: 'Priority'),
+                      items: [
                         DropdownMenuItem(value: 'low', child: Text('Low')),
                         DropdownMenuItem(
                             value: 'medium', child: Text('Medium')),
@@ -422,12 +422,12 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                       onChanged: (v) => setModalState(() => priority = v!),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<String>(
                       initialValue: status,
-                      decoration: const InputDecoration(labelText: 'Status'),
-                      items: const [
+                      decoration: InputDecoration(labelText: 'Status'),
+                      items: [
                         DropdownMenuItem(value: 'todo', child: Text('To Do')),
                         DropdownMenuItem(
                             value: 'in_progress', child: Text('In Progress')),
@@ -440,18 +440,18 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: assigneeCtrl,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Assign to (User, Team, or "All")',
                   hintText: 'e.g. Design Team, John, or All',
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.date_range_rounded),
+                leading: Icon(Icons.date_range_rounded),
                 title: Text(dueDate == null
                     ? 'Set Due Date'
                     : 'Due: ${DateFormat.yMMMd().format(dueDate!)}'),
@@ -465,7 +465,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                   if (picked != null) setModalState(() => dueDate = picked);
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -483,7 +483,7 @@ class _KanbanBoardTabState extends ConsumerState<_KanbanBoardTab> {
                         );
                     ref.invalidate(orgTasksProvider(widget.orgId));
                   },
-                  child: const Text('Create Task'),
+                  child: Text('Create Task'),
                 ),
               ),
             ],
@@ -519,7 +519,7 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
         // Messages Area
         Expanded(
           child: streamAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text('Error loading chat: $e')),
             data: (messages) {
               if (messages.isEmpty) {
@@ -531,14 +531,14 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
                       children: [
                         Icon(Icons.chat_bubble_outline_rounded,
                             size: 56, color: theme.disabledColor),
-                        const SizedBox(height: 12),
-                        const Text(
+                        SizedBox(height: 12),
+                        Text(
                           'No team messages yet',
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
-                        const SizedBox(height: 4),
-                        const Text(
+                        SizedBox(height: 4),
+                        Text(
                           'Start your team discussion or broadcast a high-priority announcement below.',
                           textAlign: TextAlign.center,
                           style: TextStyle(fontSize: 13, color: Colors.grey),
@@ -551,7 +551,7 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: messages.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => SizedBox(height: 12),
                 itemBuilder: (ctx, i) => _buildMessageBubble(messages[i]),
               );
             },
@@ -572,7 +572,7 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
                 Row(
                   children: [
                     FilterChip(
-                      label: const Text('Announcement'),
+                      label: Text('Announcement'),
                       selected: _isAnnouncement,
                       onSelected: (val) =>
                           setState(() => _isAnnouncement = val),
@@ -584,21 +584,21 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Row(
                   children: [
                     Expanded(
                       child: TextField(
                         controller: _msgController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Message team...',
                           border: OutlineInputBorder(),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     IconButton.filled(
-                      icon: const Icon(Icons.send_rounded),
+                      icon: Icon(Icons.send_rounded),
                       onPressed: _sendMessage,
                     ),
                   ],
@@ -632,9 +632,9 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
               Text(
                 msg.userName,
                 style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               if (msg.isAnnouncement)
                 Container(
                   padding:
@@ -643,7 +643,7 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
                     color: Colors.orange,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
+                  child: Text(
                     'ANNOUNCEMENT',
                     style: TextStyle(
                         color: Colors.white,
@@ -651,16 +651,16 @@ class _TeamChatTabState extends ConsumerState<_TeamChatTab> {
                         fontWeight: FontWeight.bold),
                   ),
                 ),
-              const Spacer(),
+              Spacer(),
               if (msg.createdAt != null)
                 Text(
                   DateFormat.Hm().format(msg.createdAt!),
-                  style: const TextStyle(fontSize: 11, color: Colors.grey),
+                  style: TextStyle(fontSize: 11, color: Colors.grey),
                 ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(msg.content, style: const TextStyle(fontSize: 14)),
+          SizedBox(height: 6),
+          Text(msg.content, style: TextStyle(fontSize: 14)),
         ],
       ),
     );
@@ -696,7 +696,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: const PreferredSize(
+        appBar: PreferredSize(
           preferredSize: Size.fromHeight(48),
           child: TabBar(
             tabs: [
@@ -709,7 +709,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
           children: [
             // Sub-Tab 1: Organization Members List + Add Member button
             membersAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text('Error loading members: $e')),
               data: (members) {
                 return Column(
@@ -723,10 +723,10 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                             style: theme.textTheme.titleSmall
                                 ?.copyWith(fontWeight: FontWeight.bold),
                           ),
-                          const Spacer(),
+                          Spacer(),
                           ElevatedButton.icon(
-                            icon: const Icon(Icons.person_add_rounded, size: 18),
-                            label: const Text('Add Member'),
+                            icon: Icon(Icons.person_add_rounded, size: 18),
+                            label: Text('Add Member'),
                             onPressed: () => _showAddMemberDialog(
                                 context,
                                 ref,
@@ -753,7 +753,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                                 padding: const EdgeInsets.all(16),
                                 itemCount: members.length,
                                 separatorBuilder: (_, _) =>
-                                    const SizedBox(height: 10),
+                                    SizedBox(height: 10),
                                 itemBuilder: (ctx, i) =>
                                     _buildMemberCard(ctx, ref, members[i]),
                               ),
@@ -769,11 +769,11 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
               floatingActionButton: FloatingActionButton.extended(
                 heroTag: 'fab_team_invite_code',
                 onPressed: () => _generateNewInviteCode(context, ref),
-                icon: const Icon(Icons.qr_code_rounded),
-                label: const Text('Create Invite Code'),
+                icon: Icon(Icons.qr_code_rounded),
+                label: Text('Create Invite Code'),
               ),
               body: invitesAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => Center(child: CircularProgressIndicator()),
                 error: (e, _) => Text('Error loading invites: $e'),
                 data: (invites) {
                   if (invites.isEmpty) {
@@ -789,16 +789,15 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                   return ListView.separated(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                     itemCount: invites.length,
-                    separatorBuilder: (_, _) => const SizedBox(height: 12),
+                    separatorBuilder: (_, _) => SizedBox(height: 12),
                     itemBuilder: (ctx, i) {
                       final inv = invites[i];
                       return Card(
                         child: ListTile(
-                          leading: const Icon(Icons.vpn_key_rounded,
-                              color: AppColors.primary),
+                          leading: Icon(Icons.vpn_key_rounded, color: context.colorPrimary ),
                           title: Text(
                             inv.inviteCode,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 letterSpacing: 1.5,
                                 fontSize: 16),
@@ -808,7 +807,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.copy_rounded),
+                                icon: Icon(Icons.copy_rounded),
                                 tooltip: 'Copy Code',
                                 onPressed: () {
                                   Clipboard.setData(
@@ -823,8 +822,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline_rounded,
-                                    color: AppColors.error),
+                                icon: Icon(Icons.delete_outline_rounded, color: context.colorError ),
                                 tooltip: 'Delete Invite Code',
                                 onPressed: () async {
                                   await ref
@@ -859,7 +857,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
     final roleUp = member.role.toUpperCase();
     if (roleUp == 'OWNER' || roleUp == 'MD') badgeColor = Colors.purple;
     if (roleUp == 'ADMIN' || roleUp == 'MG') badgeColor = Colors.orange;
-    if (roleUp == 'EMP' || roleUp == 'MEMBER') badgeColor = AppColors.primary;
+    if (roleUp == 'EMP' || roleUp == 'MEMBER') badgeColor = context.colorPrimary;
 
     final dispName = member.fullName ?? member.email ?? 'Team Member';
 
@@ -879,7 +877,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
               style: TextStyle(color: badgeColor, fontWeight: FontWeight.bold),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -888,17 +886,17 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                   children: [
                     Text(
                       dispName,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                     if (isMe) ...[
-                      const SizedBox(width: 6),
-                      const Text('(You)',
+                      SizedBox(width: 6),
+                      Text('(You)',
                           style: TextStyle(fontSize: 12, color: Colors.grey)),
                     ],
                   ],
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -919,7 +917,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
           ),
           if (!isMe)
             PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert_rounded),
+              icon: Icon(Icons.more_vert_rounded),
               onSelected: (newRole) async {
                 if (newRole == 'REMOVE') {
                   await ref
@@ -931,7 +929,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                       .updateMemberRole(memberId: member.id, role: newRole);
                 }
               },
-              itemBuilder: (_) => const [
+              itemBuilder: (_) => [
                 PopupMenuItem(value: 'md', child: Text('Set Role: MD')),
                 PopupMenuItem(value: 'mg', child: Text('Set Role: MG')),
                 PopupMenuItem(value: 'emp', child: Text('Set Role: EMP')),
@@ -941,7 +939,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
                 PopupMenuItem(
                   value: 'REMOVE',
                   child: Text('Remove Member',
-                      style: TextStyle(color: AppColors.error)),
+                      style: TextStyle(color: context.colorError)),
                 ),
               ],
             ),
@@ -978,7 +976,7 @@ class _TeamMembersAndInvitesTab extends ConsumerWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Created join code $code!'),
-          backgroundColor: AppColors.success,
+          backgroundColor: context.colorSuccess,
           behavior: SnackBarBehavior.floating,
         ),
       );

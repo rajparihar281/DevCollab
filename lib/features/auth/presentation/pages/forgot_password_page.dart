@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     setState(() => _isLoading = true);
 
     try {
-      log('[ForgotPasswordPage] Sending recovery link to: $email');
+
       await Supabase.instance.client.auth.resetPasswordForEmail(email);
 
       setState(() {
@@ -47,27 +46,27 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text(
               'Password recovery email sent! Check your inbox.',
               style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      log('[ForgotPasswordPage] Error sending recovery email: $e');
+
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Failed to send reset link: $e',
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -81,9 +80,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     if (otp.isEmpty || otp.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Please enter the 6-digit recovery OTP sent to your email.'),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colorError,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -93,7 +92,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     setState(() => _verifyingOtp = true);
 
     try {
-      log('[ForgotPasswordPage] Verifying recovery OTP for $email');
+
       await Supabase.instance.client.auth.verifyOTP(
         email: email,
         token: otp,
@@ -106,16 +105,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         context.push(RouteNames.resetPassword);
       }
     } catch (e) {
-      log('[ForgotPasswordPage] OTP verification error: $e');
+
       setState(() => _verifyingOtp = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Invalid OTP code: $e',
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -129,7 +128,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reset Password'),
+        title: Text('Reset Password'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -139,7 +138,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -152,14 +151,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     color: theme.colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Text(
                   'Forgot your password?',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(
                   'Enter your email address and we will send you a secure recovery link or 6-digit verification code to reset your password.',
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -168,11 +167,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'Email Address',
                     hintText: 'name@example.com',
                     prefixIcon: Icon(Icons.email_outlined),
@@ -187,14 +186,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _sendResetLink,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
@@ -202,19 +201,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Send Reset Instructions'),
+                      : Text('Send Reset Instructions'),
                 ),
                 if (_emailSent) ...[
-                  const SizedBox(height: 36),
-                  const Divider(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 36),
+                  Divider(),
+                  SizedBox(height: 24),
                   Text(
                     'Have a 6-digit recovery code?',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     'If your email provider gave you a 6-digit OTP code, enter it below to verify immediately:',
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -222,36 +221,36 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ?.withValues(alpha: 0.7),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   TextFormField(
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '6-Digit Recovery OTP',
                       hintText: '123456',
                       prefixIcon: Icon(Icons.pin_outlined),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   OutlinedButton(
                     onPressed: _verifyingOtp ? null : _verifyOtpCode,
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
                     ),
                     child: _verifyingOtp
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Verify Recovery Code'),
+                        : Text('Verify Recovery Code'),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Center(
                     child: TextButton(
                       onPressed: () => context.push(RouteNames.resetPassword),
-                      child: const Text('Already verified via email link? Reset Password Now'),
+                      child: Text('Already verified via email link? Reset Password Now'),
                     ),
                   ),
                 ],

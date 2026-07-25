@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dev_collab/features/auth/data/services/auth_service.dart';
@@ -34,12 +33,12 @@ class AuthRepository {
     required String email,
     required String password,
   }) async {
-    log('[AuthRepository] signIn called');
+
     final response = await _authService.signIn(
       email: email,
       password: password,
     );
-    log('[AuthRepository] signIn completed — session: ${response.session != null}');
+
     return response;
   }
 
@@ -48,26 +47,26 @@ class AuthRepository {
     required String password,
     String? fullName,
   }) async {
-    log('[AuthRepository] signUp called');
+
     final response = await _authService.signUp(
       email: email,
       password: password,
       fullName: fullName,
     );
-    log('[AuthRepository] signUp completed — session: ${response.session != null}');
+
     return response;
   }
 
   Future<AuthResponse> signInWithGoogle(String webClientId) async {
-    log('[AuthRepository] signInWithGoogle called');
+
     final response = await _authService.signInWithGoogle(webClientId);
-    log('[AuthRepository] signInWithGoogle completed — session: ${response.session != null}');
+
     return response;
   }
 
   Future<void> signOut() async {
-    log('[AuthRepository] signOut called');
+
     await _authService.signOut();
-    log('[AuthRepository] signOut completed');
+
   }
 }

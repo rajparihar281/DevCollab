@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/features/auth/domain/models/profile.dart';
 import 'package:dev_collab/features/auth/presentation/providers/user_profile_provider.dart';
@@ -49,34 +48,34 @@ class _NotificationPreferencesPageState
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Notification preferences saved!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      log('[NotificationPreferencesPage] Error saving: $e');
+
       final errorStr = e.toString();
       if ((errorStr.contains('PGRST204') || errorStr.contains('Could not find the')) && mounted) {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
                 Icon(Icons.warning_amber_rounded, color: Colors.orange),
                 SizedBox(width: 10),
                 Text('Database Migration Required'),
               ],
             ),
-            content: const Text(
+            content: Text(
               'To save notification preferences, please execute the SQL migration file in your Supabase SQL Editor:\n\nsupabase/migrations/20260710000001_add_profile_extended_and_notification_fields.sql',
             ),
             actions: [
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK, Got It'),
+                child: Text('OK, Got It'),
               ),
             ],
           ),
@@ -94,10 +93,10 @@ class _NotificationPreferencesPageState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Notifications & Emails'),
+        title: Text('Notifications & Emails'),
       ),
       body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (profile) {
           if (profile != null) _initFromProfile(profile);
@@ -113,32 +112,32 @@ class _NotificationPreferencesPageState
                   letterSpacing: 1.1,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('Task Assignments'),
-                subtitle: const Text(
+                title: Text('Task Assignments'),
+                subtitle: Text(
                     'Get notified immediately when a task is assigned to you.'),
                 value: _taskAssigned,
                 activeThumbColor: theme.colorScheme.primary,
                 onChanged: (v) => setState(() => _taskAssigned = v),
               ),
               SwitchListTile(
-                title: const Text('Mentions & Replies'),
-                subtitle: const Text(
+                title: Text('Mentions & Replies'),
+                subtitle: Text(
                     'Instant alerts when someone @mentions you in team chat or comments.'),
                 value: _mentions,
                 activeThumbColor: theme.colorScheme.primary,
                 onChanged: (v) => setState(() => _mentions = v),
               ),
               SwitchListTile(
-                title: const Text('Team Messages'),
-                subtitle: const Text(
+                title: Text('Team Messages'),
+                subtitle: Text(
                     'Receive push alerts for new activity in your active channels.'),
                 value: _teamMessages,
                 activeThumbColor: theme.colorScheme.primary,
                 onChanged: (v) => setState(() => _teamMessages = v),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               Text(
                 'EMAIL DIGEST & SECURITY',
                 style: theme.textTheme.labelMedium?.copyWith(
@@ -147,36 +146,36 @@ class _NotificationPreferencesPageState
                   letterSpacing: 1.1,
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               SwitchListTile(
-                title: const Text('Weekly Email Digest'),
-                subtitle: const Text(
+                title: Text('Weekly Email Digest'),
+                subtitle: Text(
                     'Summary email report of organization productivity & completed tasks.'),
                 value: _emailDigest,
                 activeThumbColor: theme.colorScheme.primary,
                 onChanged: (v) => setState(() => _emailDigest = v),
               ),
               SwitchListTile(
-                title: const Text('Critical Security Alerts'),
-                subtitle: const Text(
+                title: Text('Critical Security Alerts'),
+                subtitle: Text(
                     'Important alerts about password changes or new device logins.'),
                 value: _securityAlerts,
                 activeThumbColor: theme.colorScheme.primary,
                 onChanged: (v) => setState(() => _securityAlerts = v),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32),
               ElevatedButton(
                 onPressed: _saving ? null : _savePreferences,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                 ),
                 child: _saving
-                    ? const SizedBox(
+                    ? SizedBox(
                         width: 22,
                         height: 22,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Save Preferences'),
+                    : Text('Save Preferences'),
               ),
             ],
           );

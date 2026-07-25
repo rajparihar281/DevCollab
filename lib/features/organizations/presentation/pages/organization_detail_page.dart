@@ -23,14 +23,14 @@ class OrganizationDetailPage extends ConsumerWidget {
     final orgAsync = ref.watch(organizationDetailProvider(orgId));
 
     return orgAsync.when(
-      loading: () => const Scaffold(body: AppLoader()),
+      loading: () => Scaffold(body: AppLoader()),
       error: (e, _) => Scaffold(body: ErrorView(message: e.toString())),
       data: (org) => DefaultTabController(
         length: 3,
         child: Scaffold(
           appBar: AppBar(
             title: Text(org.name),
-            bottom: const TabBar(
+            bottom: TabBar(
               tabs: [
                 Tab(icon: Icon(Icons.groups_rounded), text: 'Teams'),
                 Tab(icon: Icon(Icons.people_alt_rounded), text: 'Members'),
@@ -49,8 +49,8 @@ class OrganizationDetailPage extends ConsumerWidget {
             heroTag: 'create_team',
             onPressed: () =>
                 context.push(RouteNames.createTeamPath(orgId)),
-            icon: const Icon(Icons.add_rounded),
-            label: const Text('New Team'),
+            icon: Icon(Icons.add_rounded),
+            label: Text('New Team'),
           ),
         ),
       ),
@@ -67,7 +67,7 @@ class _TeamsTab extends ConsumerWidget {
     final teamsAsync = ref.watch(teamsProvider(orgId));
 
     return teamsAsync.when(
-      loading: () => const AppLoader(message: 'Loading teams...'),
+      loading: () => AppLoader(message: 'Loading teams...'),
       error: (e, _) => ErrorView(
         message: e.toString(),
         onRetry: () => ref.invalidate(teamsProvider(orgId)),
@@ -85,12 +85,12 @@ class _TeamsTab extends ConsumerWidget {
                         .primary
                         .withValues(alpha: 0.4),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'No teams yet',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Text(
                     'Create a team to start working on projects.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -109,7 +109,7 @@ class _TeamsTab extends ConsumerWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                 itemCount: teams.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => SizedBox(height: 12),
                 itemBuilder: (_, i) => TeamCard(
                   team: teams[i],
                   onTap: () => context.push(
@@ -130,7 +130,7 @@ class _ActivityTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final logsAsync = ref.watch(activityLogsProvider(orgId));
     return logsAsync.when(
-      loading: () => const AppLoader(message: 'Loading activity...'),
+      loading: () => AppLoader(message: 'Loading activity...'),
       error: (e, _) => ErrorView(message: e.toString()),
       data: (logs) => ActivityFeed(logs: logs),
     );
@@ -147,7 +147,7 @@ class _MembersTab extends ConsumerWidget {
     final currentUserMemberAsync = ref.watch(currentUserMemberProvider(orgId));
 
     return membersAsync.when(
-      loading: () => const AppLoader(message: 'Loading members...'),
+      loading: () => AppLoader(message: 'Loading members...'),
       error: (e, _) => ErrorView(
         message: e.toString(),
         onRetry: () => ref.invalidate(organizationMembersProvider(orgId)),
@@ -162,10 +162,10 @@ class _MembersTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.colorSurface,
                 border: Border(
                   bottom: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -177,19 +177,19 @@ class _MembersTab extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha:0.15),
+                      color: context.colorPrimary.withValues(alpha:0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${members.length} ${members.length == 1 ? 'Member' : 'Members'}',
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                      style: TextStyle(
+                        color: context.colorPrimary,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   if (canManage)
                     ElevatedButton.icon(
                       onPressed: () {
@@ -202,14 +202,14 @@ class _MembersTab extends ConsumerWidget {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.person_add_rounded, size: 18),
-                      label: const Text(
+                      icon: Icon(Icons.person_add_rounded, size: 18),
+                      label: Text(
                         'Add Member',
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.onPrimary,
+                        backgroundColor: context.colorPrimary,
+                        foregroundColor: context.colorOnPrimary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
@@ -232,7 +232,7 @@ class _MembersTab extends ConsumerWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: members.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final member = members[index];
                     return _MemberCard(
@@ -276,22 +276,22 @@ class _MemberCard extends StatelessWidget {
   final ValueChanged<String> onUpdateRole;
   final VoidCallback onRemove;
 
-  Color _getRoleBadgeColor(String role) {
+  Color _getRoleBadgeColor(BuildContext context, String role) {
     switch (role.toLowerCase()) {
       case 'owner':
-        return const Color(0xFF9333EA); // Purple
+        return Color(0xFF9333EA); // Purple
       case 'admin':
-        return AppColors.primary; // Teal/Blue
+        return context.colorPrimary; // Teal/Blue
       case 'member':
-        return AppColors.success; // Green
+        return context.colorSuccess; // Green
       default:
-        return AppColors.textSecondary; // Grey
+        return context.colorTextSecondary; // Grey
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final badgeColor = _getRoleBadgeColor(member.role);
+    final badgeColor = _getRoleBadgeColor(context, member.role);
     final displayName = member.fullName?.isNotEmpty == true
         ? member.fullName!
         : 'Unknown Member';
@@ -301,16 +301,16 @@ class _MemberCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.colorSurface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.border.withValues(alpha: 0.5),
+          color: context.colorBorder.withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -328,20 +328,20 @@ class _MemberCard extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   displayName,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: context.colorTextPrimary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Row(
                   children: [
                     Container(
@@ -363,11 +363,11 @@ class _MemberCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     Text(
                       'Joined ${_formatDate(member.joinedAt)}',
-                      style: const TextStyle(
-                        color: AppColors.textMuted,
+                      style: TextStyle(
+                        color: context.colorTextMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -378,15 +378,15 @@ class _MemberCard extends StatelessWidget {
           ),
           if (canManage)
             PopupMenuButton<String>(
-              icon: const Icon(
+              icon: Icon(
                 Icons.more_vert_rounded,
-                color: AppColors.textSecondary,
+                color: context.colorTextSecondary,
                 size: 20,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              color: AppColors.surfaceLight,
+              color: context.colorSurfaceLight,
               onSelected: (val) {
                 if (val == 'remove') {
                   _showRemoveConfirmation(context);
@@ -395,60 +395,60 @@ class _MemberCard extends StatelessWidget {
                 }
               },
               itemBuilder: (context) => [
-                const PopupMenuItem(
+                PopupMenuItem(
                   enabled: false,
                   child: Text(
                     'CHANGE ROLE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.textMuted,
+                      color: context.colorTextMuted,
                     ),
                   ),
                 ),
                 if (member.role != 'admin')
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'admin',
                     child: Row(
                       children: [
-                        Icon(Icons.admin_panel_settings_rounded, size: 18, color: AppColors.primary),
+                        Icon(Icons.admin_panel_settings_rounded, size: 18, color: context.colorPrimary),
                         SizedBox(width: 10),
                         Text('Make Admin'),
                       ],
                     ),
                   ),
                 if (member.role != 'member')
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'member',
                     child: Row(
                       children: [
-                        Icon(Icons.person_rounded, size: 18, color: AppColors.success),
+                        Icon(Icons.person_rounded, size: 18, color: context.colorSuccess),
                         SizedBox(width: 10),
                         Text('Make Member'),
                       ],
                     ),
                   ),
                 if (member.role != 'viewer')
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'viewer',
                     child: Row(
                       children: [
-                        Icon(Icons.visibility_rounded, size: 18, color: AppColors.textSecondary),
+                        Icon(Icons.visibility_rounded, size: 18, color: context.colorTextSecondary),
                         SizedBox(width: 10),
                         Text('Make Viewer'),
                       ],
                     ),
                   ),
-                const PopupMenuDivider(),
-                const PopupMenuItem(
+                PopupMenuDivider(),
+                PopupMenuItem(
                   value: 'remove',
                   child: Row(
                     children: [
-                      Icon(Icons.person_remove_rounded, size: 18, color: AppColors.error),
+                      Icon(Icons.person_remove_rounded, size: 18, color: context.colorError),
                       SizedBox(width: 10),
                       Text(
                         'Remove from Org',
-                        style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600),
+                        style: TextStyle(color: context.colorError, fontWeight: FontWeight.w600),
                       ),
                     ],
                   ),
@@ -468,20 +468,20 @@ class _MemberCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colorSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Remove Member?',
-          style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold),
+          style: TextStyle(color: context.colorTextPrimary, fontWeight: FontWeight.bold),
         ),
         content: Text(
           'Are you sure you want to remove ${member.fullName ?? 'this user'} from the organization? They will lose access to all teams and projects.',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.colorTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            child: Text('Cancel', style: TextStyle(color: context.colorTextSecondary)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -489,10 +489,10 @@ class _MemberCard extends StatelessWidget {
               onRemove();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.onPrimary,
+              backgroundColor: context.colorError,
+              foregroundColor: context.colorOnPrimary,
             ),
-            child: const Text('Remove'),
+            child: Text('Remove'),
           ),
         ],
       ),

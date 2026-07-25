@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer' as dev;
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,9 +33,8 @@ class SavedAccountsRepository {
 
       result.sort((a, b) => b.lastLoginAt.compareTo(a.lastLoginAt));
       return result;
-    } catch (e, st) {
-      dev.log('[SavedAccountsRepository] Error reading saved accounts: $e',
-          error: e, stackTrace: st);
+    } catch (e) {
+
       return [];
     }
   }
@@ -49,7 +47,7 @@ class SavedAccountsRepository {
     String? avatarUrl,
   }) async {
     final lowerEmail = email.toLowerCase();
-    dev.log('[SavedAccountsRepository] Saving account for $lowerEmail securely');
+
 
     // Save secure password inside encrypted keychain / secure storage
     await _secureStorage.write(
@@ -80,7 +78,7 @@ class SavedAccountsRepository {
   /// Removes a saved account by email.
   Future<void> removeAccount(String email) async {
     final lowerEmail = email.toLowerCase();
-    dev.log('[SavedAccountsRepository] Removing saved account: $lowerEmail');
+
 
     await _secureStorage.delete(key: _secureKeyForEmail(lowerEmail));
 

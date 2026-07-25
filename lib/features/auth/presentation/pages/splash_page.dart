@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +8,9 @@ class SplashPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('[SplashPage] build() — waiting for auth initialization...');
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colorBackground,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -24,31 +23,31 @@ class SplashPage extends StatelessWidget {
               width: 100,
               height: 100,
             ),
-            const SizedBox(height: 28),
-            const Text(
+            SizedBox(height: 28),
+            Text(
               'DevCollab',
               style: TextStyle(
                 fontSize: 26,
                 fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
+                color: context.colorTextPrimary,
                 letterSpacing: -0.5,
               ),
             ),
-            const SizedBox(height: 8),
-            const Text(
+            SizedBox(height: 8),
+            Text(
               'Initializing workspace...',
               style: TextStyle(
                 fontSize: 14,
-                color: AppColors.textSecondary,
+                color: context.colorTextSecondary,
               ),
             ),
-            const SizedBox(height: 32),
-            const SizedBox(
+            SizedBox(height: 32),
+            SizedBox(
               width: 24,
               height: 24,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
-                color: AppColors.primary,
+                color: context.colorPrimary,
               ),
             ),
           ],
