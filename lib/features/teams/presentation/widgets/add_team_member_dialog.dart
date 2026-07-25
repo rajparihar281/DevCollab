@@ -51,7 +51,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
             content: Text(
               'Added ${_selectedMember!.fullName ?? 'Member'} to the team!',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
           ),
         );
       }
@@ -60,7 +60,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to add team member: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
           ),
         );
       }
@@ -81,19 +81,19 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
       elevation: 0,
       child: Container(
         width: 480,
-        constraints: const BoxConstraints(maxHeight: 550),
+        constraints: BoxConstraints(maxHeight: 550),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colorSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.border.withValues(alpha:0.5),
+            color: context.colorBorder.withValues(alpha:0.5),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha:0.3),
               blurRadius: 24,
-              offset: const Offset(0, 12),
+              offset: Offset(0, 12),
             ),
           ],
         ),
@@ -107,8 +107,8 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha:0.15),
-                    AppColors.secondary.withValues(alpha:0.05),
+                    context.colorPrimary.withValues(alpha:0.15),
+                    context.colorSecondary.withValues(alpha:0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -118,7 +118,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                 ),
                 border: Border(
                   bottom: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -127,17 +127,17 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha:0.2),
+                      color: context.colorPrimary.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.group_add_rounded,
-                      color: AppColors.primary,
+                      color: context.colorPrimary,
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  SizedBox(width: 14),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -146,7 +146,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colorTextPrimary,
                           ),
                         ),
                         SizedBox(height: 2),
@@ -154,16 +154,16 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                           'Select an organization colleague to add to this team',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: context.colorTextSecondary,
                           ),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
-                      color: AppColors.textSecondary,
+                      color: context.colorTextSecondary,
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -179,37 +179,37 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Search box
-                    const Text(
+                    Text(
                       'Search Organization Members',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.colorTextPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextField(
                       controller: _searchController,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: context.colorTextPrimary,
                         fontSize: 14,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Search by name or role...',
-                        hintStyle: const TextStyle(
-                          color: AppColors.textMuted,
+                        hintStyle: TextStyle(
+                          color: context.colorTextMuted,
                           fontSize: 14,
                         ),
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: AppColors.textSecondary,
+                          color: context.colorTextSecondary,
                           size: 20,
                         ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.clear_rounded,
-                                  color: AppColors.textSecondary,
+                                  color: context.colorTextSecondary,
                                   size: 18,
                                 ),
                                 onPressed: () {
@@ -222,19 +222,19 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                               )
                             : null,
                         filled: true,
-                        fillColor: AppColors.background,
+                        fillColor: context.colorBackground,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.colorBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.colorBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
+                          borderSide: BorderSide(
+                            color: context.colorPrimary,
                             width: 1.5,
                           ),
                         ),
@@ -256,15 +256,15 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Members list
                     Container(
                       height: 240,
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: context.colorBackground,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: context.colorBorder),
                       ),
                       child: orgMembersAsync.when(
                         data: (members) {
@@ -279,11 +279,11 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                               .toList();
 
                           if (availableMembers.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Text(
                                 'No available organization members found.',
                                 style: TextStyle(
-                                  color: AppColors.textMuted,
+                                  color: context.colorTextMuted,
                                   fontSize: 13,
                                 ),
                                 textAlign: TextAlign.center,
@@ -295,7 +295,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                             padding: const EdgeInsets.all(8),
                             itemCount: availableMembers.length,
                             separatorBuilder: (_, _) =>
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                             itemBuilder: (context, index) {
                               final member = availableMembers[index];
                               final isSelected =
@@ -318,12 +318,12 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppColors.primary.withValues(alpha:0.15)
+                                        ? context.colorPrimary.withValues(alpha:0.15)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(8),
                                     border: isSelected
                                         ? Border.all(
-                                            color: AppColors.primary
+                                            color: context.colorPrimary
                                                 .withValues(alpha:0.5),
                                           )
                                         : null,
@@ -333,8 +333,8 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                       CircleAvatar(
                                         radius: 16,
                                         backgroundColor: isSelected
-                                            ? AppColors.primary
-                                            : AppColors.surfaceLight,
+                                            ? context.colorPrimary
+                                            : context.colorSurfaceLight,
                                         child: Text(
                                           name.isNotEmpty
                                               ? name[0].toUpperCase()
@@ -342,13 +342,13 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                           style: TextStyle(
                                             color: isSelected
                                                 ? Colors.white
-                                                : AppColors.textPrimary,
+                                                : context.colorTextPrimary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -358,8 +358,8 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                               name,
                                               style: TextStyle(
                                                 color: isSelected
-                                                    ? AppColors.primary
-                                                    : AppColors.textPrimary,
+                                                    ? context.colorPrimary
+                                                    : context.colorTextPrimary,
                                                 fontWeight: isSelected
                                                     ? FontWeight.w600
                                                     : FontWeight.normal,
@@ -368,8 +368,8 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                             ),
                                             Text(
                                               'Org Role: ${member.role.toUpperCase()}',
-                                              style: const TextStyle(
-                                                color: AppColors.textMuted,
+                                              style: TextStyle(
+                                                color: context.colorTextMuted,
                                                 fontSize: 11,
                                               ),
                                             ),
@@ -377,9 +377,9 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                                         ),
                                       ),
                                       if (isSelected)
-                                        const Icon(
+                                        Icon(
                                           Icons.check_circle_rounded,
-                                          color: AppColors.primary,
+                                          color: context.colorPrimary,
                                           size: 18,
                                         ),
                                     ],
@@ -389,17 +389,17 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                             },
                           );
                         },
-                        loading: () => const Center(
+                        loading: () => Center(
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            color: context.colorPrimary,
                           ),
                         ),
                         error: (err, _) => Center(
                           child: Text(
                             'Error loading members: $err',
-                            style: const TextStyle(
-                              color: AppColors.error,
+                            style: TextStyle(
+                              color: context.colorError,
                               fontSize: 12,
                             ),
                           ),
@@ -415,13 +415,13 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.background.withValues(alpha:0.5),
+                color: context.colorBackground.withValues(alpha:0.5),
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(20),
                 ),
                 border: Border(
                   top: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -438,24 +438,24 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                         vertical: 12,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: AppColors.textSecondary,
+                        color: context.colorTextSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: (_selectedMember == null || _isSubmitting)
                         ? null
                         : _handleSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
+                      backgroundColor: context.colorPrimary,
+                      foregroundColor: context.colorOnPrimary,
                       disabledBackgroundColor:
-                          AppColors.primary.withValues(alpha:0.3),
+                          context.colorPrimary.withValues(alpha:0.3),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -466,7 +466,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                       elevation: 0,
                     ),
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
@@ -474,7 +474,7 @@ class _AddTeamMemberDialogState extends ConsumerState<AddTeamMemberDialog> {
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Add to Team',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,

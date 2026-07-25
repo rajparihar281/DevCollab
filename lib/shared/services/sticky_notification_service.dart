@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -23,7 +22,7 @@ class StickyNotificationService {
 
     await _notificationsPlugin.initialize(settings: initSettings);
     _initialized = true;
-    log('[StickyNotificationService] Initialized successfully');
+
   }
 
   /// Displays an ongoing/sticky quick notification that cannot be cleared
@@ -55,13 +54,13 @@ class StickyNotificationService {
       body: body,
       notificationDetails: details,
     );
-    log('[StickyNotificationService] Sticky notification #$id displayed');
+
   }
 
   /// Dismisses or acknowledges the sticky notification after user action.
   Future<void> dismissStickyNotification(int id) async {
     await init();
     await _notificationsPlugin.cancel(id: id);
-    log('[StickyNotificationService] Sticky notification #$id dismissed');
+
   }
 }

@@ -1,7 +1,6 @@
 import 'package:dev_collab/features/auth/domain/models/profile.dart';
 import 'package:dev_collab/features/organizations/domain/models/organization_member.dart';
-import 'package:dev_collab/shared/themes/app_colors.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -48,10 +47,5 @@ void main() {
       expect(profile.avatarUrl, isNull);
     });
 
-    test('AppColors constants check', () {
-      expect(AppColors.primary, const Color(0xFF6C63FF));
-      expect(AppColors.success, const Color(0xFF00C853));
-      expect(AppColors.error, const Color(0xFFCF6679));
-    });
   });
 }
