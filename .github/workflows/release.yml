@@ -1,0 +1,47 @@
+name: Auto Release APK
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build_and_release:
+    name: Build & Publish Release
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository code
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 2. Setup the Flutter environment
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+          
+      # 3. Install dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # 4. Build the Release APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 5. Create a GitHub Release and upload the APK asset automatically
+      - name: Create Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        if: success() # Only runs if the build was successful
+        with:
+          # Automatically generates a unique tag based on the GitHub Action run number and commit SHA
+          tag_name: release-build-${{ github.run_number }}
+          name: "Release Build #${{ github.run_number }}"
+          # Paths to the built APK to upload
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
