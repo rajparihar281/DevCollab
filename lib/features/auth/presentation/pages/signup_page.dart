@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/features/auth/presentation/providers/auth_provider.dart';
 import 'package:dev_collab/routing/route_names.dart';
@@ -34,7 +33,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: Duration(milliseconds: 800),
     );
     _fadeAnimation = CurvedAnimation(
       parent: _animationController,
@@ -58,11 +57,11 @@ class _SignupPageState extends ConsumerState<SignupPage>
     if (!_termsAccepted || !_privacyAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text(
+          content: Text(
             'You must agree to both the Terms & Conditions and Privacy Policy to register.',
             style: TextStyle(fontWeight: FontWeight.w600),
           ),
-          backgroundColor: AppColors.error,
+          backgroundColor: context.colorError,
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -73,7 +72,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    log('[SignupPage] Starting registration for: $email ($fullName)');
+
     setState(() => _isLoading = true);
 
     try {
@@ -93,16 +92,14 @@ class _SignupPageState extends ConsumerState<SignupPage>
             'privacy_accepted_at': now,
             'consent_given': true,
           }).eq('id', response.user!.id);
-        } catch (err) {
-          log('[SignupPage] Profile consent update note: $err');
-        }
+        } catch (err) { /* ignored */ }
       }
 
-      log('[SignupPage] Registration successful and legal consent recorded');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
                 Icon(Icons.check_circle_rounded, color: Colors.white),
                 SizedBox(width: 12),
@@ -114,7 +111,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                 ),
               ],
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -125,23 +122,23 @@ class _SignupPageState extends ConsumerState<SignupPage>
         Navigator.pop(context);
       }
     } catch (e) {
-      log('[SignupPage] Registration error: $e');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.white),
-                const SizedBox(width: 12),
+                Icon(Icons.error_outline_rounded, color: Colors.white),
+                SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Signup failed: ${_cleanErrorMessage(e.toString())}',
-                    style: const TextStyle(fontWeight: FontWeight.w500),
+                    style: TextStyle(fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
@@ -168,21 +165,21 @@ class _SignupPageState extends ConsumerState<SignupPage>
   }
 
   Future<void> _signUpWithGoogle() async {
-    log('[SignupPage] Starting Google signup');
+
     setState(() => _isLoading = true);
     
     try {
       final repository = ref.read(authRepositoryProvider);
       await repository.signInWithGoogle('732760635408-d2qmcnliljqp348v1mj240bn40sdsnjm.apps.googleusercontent.com');
-      log('[SignupPage] Google signup successful');
+
       if (mounted) context.go(RouteNames.organizations);
     } catch (e) {
-      log('[SignupPage] Google sign up failed: $e');
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Google Sign-Up failed: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
           ),
         );
       }
@@ -196,7 +193,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: context.colorBackground,
       body: Stack(
         children: [
           // Background Gradient Orbs
@@ -210,7 +207,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.secondary.withValues(alpha: 0.18),
+                    context.colorSecondary.withValues(alpha: 0.18),
                     Colors.transparent,
                   ],
                 ),
@@ -227,7 +224,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha: 0.15),
+                    context.colorPrimary.withValues(alpha: 0.15),
                     Colors.transparent,
                   ],
                 ),
@@ -243,7 +240,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                 child: FadeTransition(
                   opacity: _fadeAnimation,
                   child: Container(
-                    constraints: const BoxConstraints(maxWidth: 440),
+                    constraints: BoxConstraints(maxWidth: 440),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -253,13 +250,13 @@ class _SignupPageState extends ConsumerState<SignupPage>
                           children: [
                             IconButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_back_rounded,
-                                color: AppColors.textSecondary,
+                                color: context.colorTextSecondary,
                               ),
                               tooltip: 'Back to Login',
                             ),
-                            const Spacer(),
+                            Spacer(),
                             Image.asset(
                               Theme.of(context).brightness == Brightness.dark
                                   ? 'assets/images/dark_mode_icon.png'
@@ -267,50 +264,50 @@ class _SignupPageState extends ConsumerState<SignupPage>
                               width: 60,
                               height: 60,
                             ),
-                            const Spacer(),
-                            const SizedBox(width: 48), // Balance spacing
+                            Spacer(),
+                            SizedBox(width: 48), // Balance spacing
                           ],
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
 
                         // Title & Subtitle
-                        const Text(
+                        Text(
                           'Create an account',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colorTextPrimary,
                             letterSpacing: -0.5,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        SizedBox(height: 8),
+                        Text(
                           'Join DevCollab and start managing teams, projects, and tasks in real-time.',
                           style: TextStyle(
                             fontSize: 14,
-                            color: AppColors.textSecondary,
+                            color: context.colorTextSecondary,
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: 32),
 
                         // Form Card
                         Container(
                           padding: const EdgeInsets.all(28),
                           decoration: BoxDecoration(
-                            color: AppColors.surface,
+                            color: context.colorSurface,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: AppColors.border.withValues(alpha: 0.6),
+                              color: context.colorBorder.withValues(alpha: 0.6),
                               width: 1,
                             ),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withValues(alpha: 0.2),
                                 blurRadius: 24,
-                                offset: const Offset(0, 12),
+                                offset: Offset(0, 12),
                               ),
                             ],
                           ),
@@ -320,55 +317,55 @@ class _SignupPageState extends ConsumerState<SignupPage>
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 // Full Name Field
-                                const Text(
+                                Text(
                                   'Full Name',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: context.colorTextPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 TextFormField(
                                   controller: _nameController,
                                   textInputAction: TextInputAction.next,
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: context.colorTextPrimary,
                                     fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'Jane Doe',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.textMuted,
+                                    hintStyle: TextStyle(
+                                      color: context.colorTextMuted,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.person_outline_rounded,
-                                      color: AppColors.textSecondary,
+                                      color: context.colorTextSecondary,
                                       size: 20,
                                     ),
                                     filled: true,
-                                    fillColor: AppColors.background,
+                                    fillColor: context.colorBackground,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
+                                      borderSide: BorderSide(
+                                        color: context.colorPrimary,
                                         width: 1.5,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.error),
+                                      borderSide: BorderSide(
+                                          color: context.colorError),
                                     ),
                                     contentPadding:
                                         const EdgeInsets.symmetric(
@@ -383,59 +380,59 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
 
                                 // Email Field
-                                const Text(
+                                Text(
                                   'Email Address',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: context.colorTextPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 TextFormField(
                                   controller: _emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   textInputAction: TextInputAction.next,
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: context.colorTextPrimary,
                                     fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'name@company.com',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.textMuted,
+                                    hintStyle: TextStyle(
+                                      color: context.colorTextMuted,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.mail_outline_rounded,
-                                      color: AppColors.textSecondary,
+                                      color: context.colorTextSecondary,
                                       size: 20,
                                     ),
                                     filled: true,
-                                    fillColor: AppColors.background,
+                                    fillColor: context.colorBackground,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
+                                      borderSide: BorderSide(
+                                        color: context.colorPrimary,
                                         width: 1.5,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.error),
+                                      borderSide: BorderSide(
+                                          color: context.colorError),
                                     ),
                                     contentPadding:
                                         const EdgeInsets.symmetric(
@@ -454,35 +451,35 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
 
                                 // Password Field
-                                const Text(
+                                Text(
                                   'Password',
                                   style: TextStyle(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: context.colorTextPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 TextFormField(
                                   controller: _passwordController,
                                   obscureText: _obscurePassword,
                                   textInputAction: TextInputAction.done,
                                   onFieldSubmitted: (_) => _signUp(),
-                                  style: const TextStyle(
-                                    color: AppColors.textPrimary,
+                                  style: TextStyle(
+                                    color: context.colorTextPrimary,
                                     fontSize: 14,
                                   ),
                                   decoration: InputDecoration(
                                     hintText: 'At least 6 characters',
-                                    hintStyle: const TextStyle(
-                                      color: AppColors.textMuted,
+                                    hintStyle: TextStyle(
+                                      color: context.colorTextMuted,
                                     ),
-                                    prefixIcon: const Icon(
+                                    prefixIcon: Icon(
                                       Icons.lock_outline_rounded,
-                                      color: AppColors.textSecondary,
+                                      color: context.colorTextSecondary,
                                       size: 20,
                                     ),
                                     suffixIcon: IconButton(
@@ -490,7 +487,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                         _obscurePassword
                                             ? Icons.visibility_outlined
                                             : Icons.visibility_off_outlined,
-                                        color: AppColors.textSecondary,
+                                        color: context.colorTextSecondary,
                                         size: 20,
                                       ),
                                       onPressed: () {
@@ -499,28 +496,28 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                       },
                                     ),
                                     filled: true,
-                                    fillColor: AppColors.background,
+                                    fillColor: context.colorBackground,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.border),
+                                      borderSide: BorderSide(
+                                          color: context.colorBorder),
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                        color: AppColors.primary,
+                                      borderSide: BorderSide(
+                                        color: context.colorPrimary,
                                         width: 1.5,
                                       ),
                                     ),
                                     errorBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: const BorderSide(
-                                          color: AppColors.error),
+                                      borderSide: BorderSide(
+                                          color: context.colorError),
                                     ),
                                     contentPadding:
                                         const EdgeInsets.symmetric(
@@ -538,22 +535,22 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     return null;
                                   },
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
 
                                 // Legal Consent Checkboxes
                                 CheckboxListTile(
                                   contentPadding: EdgeInsets.zero,
                                   controlAffinity: ListTileControlAffinity.leading,
-                                  activeColor: AppColors.primary,
+                                  activeColor: context.colorPrimary,
                                   value: _termsAccepted,
                                   onChanged: (val) => setState(() => _termsAccepted = val ?? false),
                                   title: GestureDetector(
                                     onTap: () => context.push(RouteNames.terms),
-                                    child: const Text(
+                                    child: Text(
                                       'I agree to the Terms & Conditions',
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: AppColors.primary,
+                                        color: context.colorPrimary,
                                         decoration: TextDecoration.underline,
                                       ),
                                     ),
@@ -562,30 +559,30 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                 CheckboxListTile(
                                   contentPadding: EdgeInsets.zero,
                                   controlAffinity: ListTileControlAffinity.leading,
-                                  activeColor: AppColors.primary,
+                                  activeColor: context.colorPrimary,
                                   value: _privacyAccepted,
                                   onChanged: (val) => setState(() => _privacyAccepted = val ?? false),
                                   title: GestureDetector(
                                     onTap: () => context.push(RouteNames.privacy),
-                                    child: const Text(
+                                    child: Text(
                                       'I agree to the Privacy Policy',
                                       style: TextStyle(
                                         fontSize: 13,
-                                        color: AppColors.primary,
+                                        color: context.colorPrimary,
                                         decoration: TextDecoration.underline,
                                       ),
                                     ),
                                   ),
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
 
                                 // Signup Button
                                 ElevatedButton(
                                   onPressed: _isLoading ? null : _signUp,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: AppColors.primary,
-                                    foregroundColor: AppColors.onPrimary,
-                                    disabledBackgroundColor: AppColors.primary
+                                    backgroundColor: context.colorPrimary,
+                                    foregroundColor: context.colorOnPrimary,
+                                    disabledBackgroundColor: context.colorPrimary
                                         .withValues(alpha: 0.4),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 16),
@@ -595,15 +592,15 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     elevation: 0,
                                   ),
                                   child: _isLoading
-                                      ? const SizedBox(
+                                      ? SizedBox(
                                           height: 22,
                                           width: 22,
                                           child: CircularProgressIndicator(
                                             strokeWidth: 2.5,
-                                            color: AppColors.onPrimary,
+                                            color: context.colorOnPrimary,
                                           ),
                                         )
-                                      : const Row(
+                                      : Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
@@ -622,7 +619,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                           ],
                                         ),
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 // Google Sign Up Button
                                 ElevatedButton(
                                   onPressed: _isLoading ? null : _signUpWithGoogle,
@@ -638,7 +635,7 @@ class _SignupPageState extends ConsumerState<SignupPage>
                                     ),
                                     elevation: 0,
                                   ),
-                                  child: const Row(
+                                  child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.center,
                                     children: [
@@ -662,25 +659,25 @@ class _SignupPageState extends ConsumerState<SignupPage>
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
 
                         // Switch to Login
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Already have an account?',
                               style: TextStyle(
-                                color: AppColors.textSecondary,
+                                color: context.colorTextSecondary,
                                 fontSize: 14,
                               ),
                             ),
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child: const Text(
+                              child: Text(
                                 'Sign In',
                                 style: TextStyle(
-                                  color: AppColors.primary,
+                                  color: context.colorPrimary,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
