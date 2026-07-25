@@ -1,28 +1,54 @@
-import 'dart:developer';
 
+import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 
-/// Splash screen shown while waiting for the initial auth state from Supabase.
-///
-/// Navigation away from this screen is handled entirely by GoRouter's
-/// `redirect` function — once [AuthNotifier.isInitialized] becomes true,
-/// the router redirects to either `/login` or `/organizations`.
+/// Splash screen shown while waiting for initial auth state.
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    log('[SplashPage] build() — waiting for auth initialization...');
-    return const Scaffold(
+
+    return Scaffold(
+      backgroundColor: context.colorBackground,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 24),
+            // Logo Image Placeholder — can be replaced with Image.asset('assets/logo.png') later
+            Image.asset(
+              Theme.of(context).brightness == Brightness.dark
+                  ? 'assets/images/dark_mode_icon.png'
+                  : 'assets/images/light_mode_icon.png',
+              width: 100,
+              height: 100,
+            ),
+            SizedBox(height: 28),
             Text(
-              'Loading...',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              'DevCollab',
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
+                color: context.colorTextPrimary,
+                letterSpacing: -0.5,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Initializing workspace...',
+              style: TextStyle(
+                fontSize: 14,
+                color: context.colorTextSecondary,
+              ),
+            ),
+            SizedBox(height: 32),
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: context.colorPrimary,
+              ),
             ),
           ],
         ),

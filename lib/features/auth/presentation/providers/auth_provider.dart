@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:dev_collab/core/supabase/supabase_provider.dart';
 import 'package:dev_collab/features/auth/data/repositories/auth_repository.dart';
@@ -26,10 +25,10 @@ final authStateProvider = StreamProvider<AuthState>((ref) {
   final repository = ref.watch(authRepositoryProvider);
 
   return repository.authStateChanges.map((authState) {
-    log('[authStateProvider] Auth event: ${authState.event}');
-    log('[authStateProvider] Session: ${authState.session != null ? "EXISTS" : "NULL"}');
+
+
     if (authState.session != null) {
-      log('[authStateProvider] User: ${authState.session!.user.email}');
+
     }
     return authState;
   });
@@ -59,14 +58,14 @@ class AuthNotifier extends ChangeNotifier {
   void _init() {
     // Seed with the current session (may be null).
     _session = _repository.currentSession;
-    log('[AuthNotifier] Initial session: ${_session != null ? "EXISTS" : "NULL"}');
+
 
     _subscription = _repository.authStateChanges.listen(
       (authState) {
-        log('[AuthNotifier] Auth event: ${authState.event}');
-        log('[AuthNotifier] Session: ${authState.session != null ? "EXISTS" : "NULL"}');
+
+
         if (authState.session != null) {
-          log('[AuthNotifier] User: ${authState.session!.user.email}');
+
         }
 
         _session = authState.session;
@@ -74,8 +73,8 @@ class AuthNotifier extends ChangeNotifier {
         notifyListeners(); // ← Triggers GoRouter redirect re-evaluation
       },
       onError: (error, stack) {
-        log('[AuthNotifier] Stream ERROR: $error');
-        log('[AuthNotifier] Stream STACK: $stack');
+
+
         _isInitialized = true;
         notifyListeners();
       },
