@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:dev_collab/features/auth/domain/models/profile.dart';
@@ -39,7 +38,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) {
@@ -48,7 +47,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               Container(
                 width: 40,
                 height: 4,
@@ -57,10 +56,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               ListTile(
-                leading: const Icon(Icons.photo_library_rounded, color: AppColors.primary),
-                title: const Text('Choose Photo & Edit'),
+                leading: Icon(Icons.photo_library_rounded, color: context.colorPrimary ),
+                title: Text('Choose Photo & Edit'),
                 onTap: () {
                   Navigator.pop(ctx);
                   _pickEditAndUploadAvatar();
@@ -68,17 +67,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
               ),
               if (hasPhoto)
                 ListTile(
-                  leading: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
-                  title: const Text(
+                  leading: Icon(Icons.delete_outline_rounded, color: context.colorError ),
+                  title: Text(
                     'Remove Current Photo',
-                    style: TextStyle(color: AppColors.error),
+                    style: TextStyle(color: context.colorError),
                   ),
                   onTap: () {
                     Navigator.pop(ctx);
                     _removeAvatar();
                   },
                 ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
             ],
           ),
         );
@@ -92,15 +91,13 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await ref.read(userProfileProvider.notifier).deleteAvatar();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Profile picture removed.'),
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
-    } catch (e) {
-      log('[ProfilePage] error deleting avatar: $e');
-    } finally {
+    } catch (e) { /* ignored */ } finally {
       if (mounted) setState(() => _uploadingAvatar = false);
     }
   }
@@ -128,15 +125,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
       if (mounted && newUrl != null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Profile picture updated successfully!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      log('[ProfilePage] error uploading avatar: $e');
+
       final errStr = e.toString();
       if ((errStr.contains('403') ||
               errStr.contains('row-level security') ||
@@ -145,20 +142,20 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Row(
+            title: Row(
               children: [
                 Icon(Icons.warning_amber_rounded, color: Colors.orange),
                 SizedBox(width: 10),
                 Text('Storage Policy Required'),
               ],
             ),
-            content: const Text(
+            content: Text(
               'Your "profile pics" bucket is protected by Supabase Row-Level Security (RLS).\n\nPlease execute the SQL script in your Supabase SQL Editor to allow image uploads:\n\nsupabase/migrations/20260710000002_add_storage_bucket_policies.sql',
             ),
             actions: [
               ElevatedButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text('OK, Got It'),
+                child: Text('OK, Got It'),
               ),
             ],
           ),
@@ -167,7 +164,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to upload picture: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -258,15 +255,15 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('Profile updated successfully!'),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
-      log('[ProfilePage] error updating profile: $e');
+
       final errorStr = e.toString();
       if (errorStr.contains('PGRST204') || errorStr.contains('Could not find the')) {
         try {
@@ -275,26 +272,26 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
             'full_name': _nameController.text.trim(),
             'updated_at': DateTime.now().toIso8601String(),
           });
-        } catch (_) {}
+        } catch (_) { /* ignored */ }
 
         if (mounted) {
           showDialog(
             context: context,
             builder: (ctx) => AlertDialog(
-              title: const Row(
+              title: Row(
                 children: [
                   Icon(Icons.warning_amber_rounded, color: Colors.orange),
                   SizedBox(width: 10),
                   Text('Database Migration Required'),
                 ],
               ),
-              content: const Text(
+              content: Text(
                 'Basic profile name saved!\n\nTo save bio, username, teams, and notification settings, please execute the SQL migration file in your Supabase SQL Editor:\n\nsupabase/migrations/20260710000001_add_profile_extended_and_notification_fields.sql',
               ),
               actions: [
                 ElevatedButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('OK, Got It'),
+                  child: Text('OK, Got It'),
                 ),
               ],
             ),
@@ -304,7 +301,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to update profile: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -321,17 +318,17 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile'),
+        title: Text('My Profile'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_active_outlined),
+            icon: Icon(Icons.notifications_active_outlined),
             tooltip: 'Notification & Email Preferences',
             onPressed: () => context.push(RouteNames.notificationPreferences),
           ),
         ],
       ),
       body: profileAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(child: Text('Error loading profile: $e')),
         data: (profile) {
           if (profile != null) _populateFromProfile(profile);
@@ -359,7 +356,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ? NetworkImage(profile.avatarUrl!)
                                 : null,
                             child: _uploadingAvatar
-                                ? const CircularProgressIndicator(
+                                ? CircularProgressIndicator(
                                     color: Colors.white)
                                 : (profile?.avatarUrl == null ||
                                         profile!.avatarUrl!.isEmpty)
@@ -400,12 +397,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28),
 
                   // Full Name
                   TextFormField(
                     controller: _nameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Full Name',
                       prefixIcon: Icon(Icons.person_outline_rounded),
                     ),
@@ -413,36 +410,36 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         ? 'Name is required'
                         : null,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // Username
                   TextFormField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Username',
                       prefixIcon: Icon(Icons.alternate_email_rounded),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // Bio
                   TextFormField(
                     controller: _bioController,
                     maxLines: 3,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Bio',
                       hintText: 'Tell your team about yourself...',
                       prefixIcon: Icon(Icons.info_outline_rounded),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // Date of Birth
                   InkWell(
                     onTap: _pickDob,
                     borderRadius: BorderRadius.circular(12),
                     child: InputDecorator(
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Date of Birth',
                         prefixIcon: Icon(Icons.calendar_today_rounded),
                       ),
@@ -453,27 +450,27 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // Job Title / Description
                   TextFormField(
                     controller: _jobTitleController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Job Description / Title',
                       prefixIcon: Icon(Icons.work_outline_rounded),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
 
                   // Current Company
                   TextFormField(
                     controller: _companyController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'Current Company',
                       prefixIcon: Icon(Icons.business_rounded),
                     ),
                   ),
-                  const SizedBox(height: 28),
+                  SizedBox(height: 28),
 
                   // Private Teams Section (Visible only to owner)
                   Container(
@@ -493,7 +490,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                               size: 18,
                               color: theme.colorScheme.primary,
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Text(
                               'My Current Teams (Private)',
                               style: theme.textTheme.titleSmall?.copyWith(
@@ -502,7 +499,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 6),
+                        SizedBox(height: 6),
                         Text(
                           'Only you can see this list of internal teams.',
                           style: theme.textTheme.bodySmall?.copyWith(
@@ -510,25 +507,25 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 ?.withValues(alpha: 0.7),
                           ),
                         ),
-                        const SizedBox(height: 14),
+                        SizedBox(height: 14),
                         Wrap(
                           spacing: 8,
                           runSpacing: 8,
                           children: _teams.map((t) {
                             return Chip(
                               label: Text(t),
-                              deleteIcon: const Icon(Icons.close, size: 16),
+                              deleteIcon: Icon(Icons.close, size: 16),
                               onDeleted: () => _removeTeam(t),
                             );
                           }).toList(),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Row(
                           children: [
                             Expanded(
                               child: TextField(
                                 controller: _teamInputController,
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   hintText: 'Add team (e.g. Core Infra)',
                                   contentPadding: EdgeInsets.symmetric(
                                       horizontal: 14, vertical: 10),
@@ -536,21 +533,21 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                                 onSubmitted: (_) => _addTeam(),
                               ),
                             ),
-                            const SizedBox(width: 10),
+                            SizedBox(width: 10),
                             ElevatedButton(
                               onPressed: _addTeam,
                               style: ElevatedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 18, vertical: 14),
                               ),
-                              child: const Text('Add'),
+                              child: Text('Add'),
                             ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
 
                   // Save Button
                   ElevatedButton(
@@ -559,14 +556,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                       minimumSize: const Size.fromHeight(52),
                     ),
                     child: _saving
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 22,
                             height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Text('Save Changes'),
+                        : Text('Save Changes'),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                 ],
               ),
             ),

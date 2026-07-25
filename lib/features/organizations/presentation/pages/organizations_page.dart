@@ -36,7 +36,7 @@ class _OrganizationsPageState extends ConsumerState<OrganizationsPage> {
   Future<void> _dismissOngoingNotification() async {
     try {
       await StickyNotificationService().dismissStickyNotification(101);
-    } catch (_) {}
+    } catch (_) { /* ignored */ }
   }
 
   Future<void> _checkPendingLoginPrompt() async {

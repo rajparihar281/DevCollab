@@ -72,7 +72,7 @@ class _AddOrganizationMemberDialogState
             content: Text(
               'Added ${_selectedProfile!.fullName} as $_selectedRole',
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
           ),
         );
       }
@@ -81,7 +81,7 @@ class _AddOrganizationMemberDialogState
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to add member: $e'),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
           ),
         );
       }
@@ -101,19 +101,19 @@ class _AddOrganizationMemberDialogState
       elevation: 0,
       child: Container(
         width: 480,
-        constraints: const BoxConstraints(maxHeight: 650),
+        constraints: BoxConstraints(maxHeight: 650),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: context.colorSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: AppColors.border.withValues(alpha:0.5),
+            color: context.colorBorder.withValues(alpha:0.5),
             width: 1,
           ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha:0.3),
               blurRadius: 24,
-              offset: const Offset(0, 12),
+              offset: Offset(0, 12),
             ),
           ],
         ),
@@ -127,8 +127,8 @@ class _AddOrganizationMemberDialogState
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppColors.primary.withValues(alpha:0.15),
-                    AppColors.secondary.withValues(alpha:0.05),
+                    context.colorPrimary.withValues(alpha:0.15),
+                    context.colorSecondary.withValues(alpha:0.05),
                   ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -138,7 +138,7 @@ class _AddOrganizationMemberDialogState
                 ),
                 border: Border(
                   bottom: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -147,17 +147,17 @@ class _AddOrganizationMemberDialogState
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha:0.2),
+                      color: context.colorPrimary.withValues(alpha:0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.person_add_rounded,
-                      color: AppColors.primary,
+                      color: context.colorPrimary,
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 14),
-                  const Expanded(
+                  SizedBox(width: 14),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -166,7 +166,7 @@ class _AddOrganizationMemberDialogState
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.textPrimary,
+                            color: context.colorTextPrimary,
                           ),
                         ),
                         SizedBox(height: 2),
@@ -174,16 +174,16 @@ class _AddOrganizationMemberDialogState
                           'Search for users and assign a collaborative role',
                           style: TextStyle(
                             fontSize: 13,
-                            color: AppColors.textSecondary,
+                            color: context.colorTextSecondary,
                           ),
                         ),
                       ],
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.close_rounded,
-                      color: AppColors.textSecondary,
+                      color: context.colorTextSecondary,
                     ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
@@ -199,37 +199,37 @@ class _AddOrganizationMemberDialogState
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Search box
-                    const Text(
+                    Text(
                       'Select User',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.colorTextPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextField(
                       controller: _searchController,
-                      style: const TextStyle(
-                        color: AppColors.textPrimary,
+                      style: TextStyle(
+                        color: context.colorTextPrimary,
                         fontSize: 14,
                       ),
                       decoration: InputDecoration(
                         hintText: 'Search by name...',
-                        hintStyle: const TextStyle(
-                          color: AppColors.textMuted,
+                        hintStyle: TextStyle(
+                          color: context.colorTextMuted,
                           fontSize: 14,
                         ),
-                        prefixIcon: const Icon(
+                        prefixIcon: Icon(
                           Icons.search_rounded,
-                          color: AppColors.textSecondary,
+                          color: context.colorTextSecondary,
                           size: 20,
                         ),
                         suffixIcon: _searchQuery.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(
+                                icon: Icon(
                                   Icons.clear_rounded,
-                                  color: AppColors.textSecondary,
+                                  color: context.colorTextSecondary,
                                   size: 18,
                                 ),
                                 onPressed: () {
@@ -242,19 +242,19 @@ class _AddOrganizationMemberDialogState
                               )
                             : null,
                         filled: true,
-                        fillColor: AppColors.background,
+                        fillColor: context.colorBackground,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.colorBorder),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppColors.border),
+                          borderSide: BorderSide(color: context.colorBorder),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: AppColors.primary,
+                          borderSide: BorderSide(
+                            color: context.colorPrimary,
                             width: 1.5,
                           ),
                         ),
@@ -276,15 +276,15 @@ class _AddOrganizationMemberDialogState
                       },
                     ),
 
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
 
                     // User Results List
                     Container(
                       height: 160,
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: context.colorBackground,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.border),
+                        border: Border.all(color: context.colorBorder),
                       ),
                       child: profilesAsync.when(
                         data: (profiles) {
@@ -294,11 +294,11 @@ class _AddOrganizationMemberDialogState
                               .toList();
 
                           if (availableProfiles.isEmpty) {
-                            return const Center(
+                            return Center(
                               child: Text(
                                 'No users found or all users are already members.',
                                 style: TextStyle(
-                                  color: AppColors.textMuted,
+                                  color: context.colorTextMuted,
                                   fontSize: 13,
                                 ),
                                 textAlign: TextAlign.center,
@@ -310,7 +310,7 @@ class _AddOrganizationMemberDialogState
                             padding: const EdgeInsets.all(8),
                             itemCount: availableProfiles.length,
                             separatorBuilder: (_, _) =>
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                             itemBuilder: (context, index) {
                               final profile = availableProfiles[index];
                               final isSelected =
@@ -330,12 +330,12 @@ class _AddOrganizationMemberDialogState
                                   ),
                                   decoration: BoxDecoration(
                                     color: isSelected
-                                        ? AppColors.primary.withValues(alpha:0.15)
+                                        ? context.colorPrimary.withValues(alpha:0.15)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(8),
                                     border: isSelected
                                         ? Border.all(
-                                            color: AppColors.primary
+                                            color: context.colorPrimary
                                                 .withValues(alpha:0.5),
                                           )
                                         : null,
@@ -345,8 +345,8 @@ class _AddOrganizationMemberDialogState
                                       CircleAvatar(
                                         radius: 16,
                                         backgroundColor: isSelected
-                                            ? AppColors.primary
-                                            : AppColors.surfaceLight,
+                                            ? context.colorPrimary
+                                            : context.colorSurfaceLight,
                                         child: Text(
                                           profile.fullName.isNotEmpty
                                               ? profile.fullName[0]
@@ -355,13 +355,13 @@ class _AddOrganizationMemberDialogState
                                           style: TextStyle(
                                             color: isSelected
                                                 ? Colors.white
-                                                : AppColors.textPrimary,
+                                                : context.colorTextPrimary,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 13,
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment:
@@ -371,8 +371,8 @@ class _AddOrganizationMemberDialogState
                                               profile.fullName,
                                               style: TextStyle(
                                                 color: isSelected
-                                                    ? AppColors.primary
-                                                    : AppColors.textPrimary,
+                                                    ? context.colorPrimary
+                                                    : context.colorTextPrimary,
                                                 fontWeight: isSelected
                                                     ? FontWeight.w600
                                                     : FontWeight.normal,
@@ -383,9 +383,9 @@ class _AddOrganizationMemberDialogState
                                         ),
                                       ),
                                       if (isSelected)
-                                        const Icon(
+                                        Icon(
                                           Icons.check_circle_rounded,
-                                          color: AppColors.primary,
+                                          color: context.colorPrimary,
                                           size: 18,
                                         ),
                                     ],
@@ -395,17 +395,17 @@ class _AddOrganizationMemberDialogState
                             },
                           );
                         },
-                        loading: () => const Center(
+                        loading: () => Center(
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: AppColors.primary,
+                            color: context.colorPrimary,
                           ),
                         ),
                         error: (err, _) => Center(
                           child: Text(
                             'Error loading users: $err',
-                            style: const TextStyle(
-                              color: AppColors.error,
+                            style: TextStyle(
+                              color: context.colorError,
                               fontSize: 12,
                             ),
                           ),
@@ -413,18 +413,18 @@ class _AddOrganizationMemberDialogState
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     // Role Selection
-                    const Text(
+                    Text(
                       'Assign Role',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
+                        color: context.colorTextPrimary,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     ..._roles.map((role) {
                       final isSelected = _selectedRole == role['value'];
                       return Padding(
@@ -440,13 +440,13 @@ class _AddOrganizationMemberDialogState
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? AppColors.primary.withValues(alpha:0.1)
-                                  : AppColors.background,
+                                  ? context.colorPrimary.withValues(alpha:0.1)
+                                  : context.colorBackground,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.border,
+                                    ? context.colorPrimary
+                                    : context.colorBorder,
                                 width: isSelected ? 1.5 : 1,
                               ),
                             ),
@@ -457,11 +457,11 @@ class _AddOrganizationMemberDialogState
                                       ? Icons.radio_button_checked_rounded
                                       : Icons.radio_button_unchecked_rounded,
                                   color: isSelected
-                                      ? AppColors.primary
-                                      : AppColors.textSecondary,
+                                      ? context.colorPrimary
+                                      : context.colorTextSecondary,
                                   size: 22,
                                 ),
-                                const SizedBox(width: 12),
+                                SizedBox(width: 12),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -471,17 +471,17 @@ class _AddOrganizationMemberDialogState
                                         role['label']!,
                                         style: TextStyle(
                                           color: isSelected
-                                              ? AppColors.primary
-                                              : AppColors.textPrimary,
+                                              ? context.colorPrimary
+                                              : context.colorTextPrimary,
                                           fontWeight: FontWeight.w600,
                                           fontSize: 14,
                                         ),
                                       ),
-                                      const SizedBox(height: 2),
+                                      SizedBox(height: 2),
                                       Text(
                                         role['desc']!,
-                                        style: const TextStyle(
-                                          color: AppColors.textSecondary,
+                                        style: TextStyle(
+                                          color: context.colorTextSecondary,
                                           fontSize: 12,
                                         ),
                                       ),
@@ -503,13 +503,13 @@ class _AddOrganizationMemberDialogState
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppColors.background.withValues(alpha:0.5),
+                color: context.colorBackground.withValues(alpha:0.5),
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(20),
                 ),
                 border: Border(
                   top: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -526,24 +526,24 @@ class _AddOrganizationMemberDialogState
                         vertical: 12,
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
-                        color: AppColors.textSecondary,
+                        color: context.colorTextSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   ElevatedButton(
                     onPressed: (_selectedProfile == null || _isSubmitting)
                         ? null
                         : _handleSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
+                      backgroundColor: context.colorPrimary,
+                      foregroundColor: context.colorOnPrimary,
                       disabledBackgroundColor:
-                          AppColors.primary.withValues(alpha:0.3),
+                          context.colorPrimary.withValues(alpha:0.3),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
                         vertical: 12,
@@ -554,7 +554,7 @@ class _AddOrganizationMemberDialogState
                       elevation: 0,
                     ),
                     child: _isSubmitting
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
@@ -562,7 +562,7 @@ class _AddOrganizationMemberDialogState
                               color: Colors.white,
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'Add Member',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
