@@ -1,4 +1,3 @@
-import 'dart:developer' as dev;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../domain/models/kanban_project.dart';
@@ -14,10 +13,10 @@ class OrganizationRepository {
   Future<List<Organization>> getOrganizations() async {
     final user = _client.auth.currentUser;
     if (user == null) {
-      dev.log('[OrganizationRepository] No current auth user logged in. Returning empty organizations list.');
+
       return [];
     }
-    dev.log('[OrganizationRepository] Fetching organizations for user: ${user.id}');
+
 
     try {
       // Get org IDs where user is member
@@ -45,16 +44,16 @@ class OrganizationRepository {
         return org.ownerId == user.id || memberOrgIds.contains(org.id);
       }).toList();
 
-      dev.log('[OrganizationRepository] Loaded ${myOrgs.length} organizations strictly belonging to user ${user.id}.');
+
       return myOrgs;
-    } catch (e, st) {
-      dev.log('[OrganizationRepository] Error fetching organizations: $e', error: e, stackTrace: st);
+    } catch (e) {
+
       rethrow;
     }
   }
 
   Future<Organization> getOrganizationById(String id) async {
-    dev.log('[OrganizationRepository] Fetching organization by ID: $id');
+
     try {
       final response = await _client
           .from('organizations')
@@ -62,8 +61,8 @@ class OrganizationRepository {
           .eq('id', id)
           .single();
       return Organization.fromJson(response);
-    } catch (e, st) {
-      dev.log('[OrganizationRepository] Error fetching organization $id: $e', error: e, stackTrace: st);
+    } catch (e) {
+
       rethrow;
     }
   }
@@ -72,7 +71,7 @@ class OrganizationRepository {
     final user = _client.auth.currentUser!;
     final now = DateTime.now().toIso8601String();
 
-    dev.log('[OrganizationRepository] Creating organization "$name" by user ${user.id}');
+
 
     try {
       final response = await _client
@@ -88,7 +87,7 @@ class OrganizationRepository {
           .single();
 
       final org = Organization.fromJson(response);
-      dev.log('[OrganizationRepository] Organization inserted: ID=${org.id}. Ensuring owner membership via upsert...');
+
 
       // Auto-add creator as owner member (upsert avoids conflict with DB trigger)
       await _client.from('organization_members').upsert({
@@ -98,10 +97,10 @@ class OrganizationRepository {
         'joined_at': now,
       }, onConflict: 'organization_id, user_id');
 
-      dev.log('[OrganizationRepository] Organization created and membership ensured successfully: ${org.name}');
+
       return org;
-    } catch (e, st) {
-      dev.log('[OrganizationRepository] ERROR creating organization "$name": $e', error: e, stackTrace: st);
+    } catch (e) {
+
       rethrow;
     }
   }
@@ -111,27 +110,27 @@ class OrganizationRepository {
     String? name,
     String? description,
   }) async {
-    dev.log('[OrganizationRepository] Updating organization $id');
+
     try {
       final updates = <String, dynamic>{'updated_at': DateTime.now().toIso8601String()};
       if (name != null) updates['name'] = name;
       if (description != null) updates['description'] = description;
 
       await _client.from('organizations').update(updates).eq('id', id);
-      dev.log('[OrganizationRepository] Updated organization $id successfully.');
-    } catch (e, st) {
-      dev.log('[OrganizationRepository] Error updating organization $id: $e', error: e, stackTrace: st);
+
+    } catch (e) {
+
       rethrow;
     }
   }
 
   Future<void> deleteOrganization(String organizationId) async {
-    dev.log('[OrganizationRepository] Deleting organization $organizationId');
+
     try {
       await _client.from('organizations').delete().eq('id', organizationId);
-      dev.log('[OrganizationRepository] Deleted organization $organizationId successfully.');
-    } catch (e, st) {
-      dev.log('[OrganizationRepository] Error deleting organization $organizationId: $e', error: e, stackTrace: st);
+
+    } catch (e) {
+
       rethrow;
     }
   }
@@ -224,7 +223,7 @@ class OrganizationRepository {
       if (assigneesToInsert.isNotEmpty) {
         try {
           await _client.from('task_assignees').insert(assigneesToInsert);
-        } catch (_) {} // Ignore if table doesn't exist yet
+        } catch (_) { /* ignored */ } // Ignore if table doesn't exist yet
       }
     }
 

@@ -41,14 +41,14 @@ class TeamDetailPage extends ConsumerWidget {
               title: Text(teamName),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.chat_bubble_outline_rounded),
+                  icon: Icon(Icons.chat_bubble_outline_rounded),
                   tooltip: 'Full Screen Chat',
                   onPressed: () => context.push(
                     RouteNames.chatPath(orgId, teamId),
                   ),
                 ),
               ],
-              bottom: const TabBar(
+              bottom: TabBar(
                 tabs: [
                   Tab(icon: Icon(Icons.folder_rounded), text: 'Projects'),
                   Tab(icon: Icon(Icons.people_rounded), text: 'Members'),
@@ -67,8 +67,8 @@ class TeamDetailPage extends ConsumerWidget {
               heroTag: 'create_project',
               onPressed: () =>
                   context.push(RouteNames.createProjectPath(orgId, teamId)),
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('New Project'),
+              icon: Icon(Icons.add_rounded),
+              label: Text('New Project'),
             ),
           ),
         );
@@ -86,7 +86,7 @@ class _ProjectsTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final projectsAsync = ref.watch(projectsProvider(teamId));
     return projectsAsync.when(
-      loading: () => const AppLoader(message: 'Loading projects...'),
+      loading: () => AppLoader(message: 'Loading projects...'),
       error: (e, _) => ErrorView(
         message: e.toString(),
         onRetry: () => ref.invalidate(projectsProvider(teamId)),
@@ -104,7 +104,7 @@ class _ProjectsTab extends ConsumerWidget {
                         .primary
                         .withValues(alpha:0.4),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   Text(
                     'No projects yet',
                     style: Theme.of(context).textTheme.titleMedium,
@@ -118,7 +118,7 @@ class _ProjectsTab extends ConsumerWidget {
               child: ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
                 itemCount: projects.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => SizedBox(height: 12),
                 itemBuilder: (_, i) => ProjectCard(
                   project: projects[i],
                   onTap: () => context.push(
@@ -142,7 +142,7 @@ class _MembersTab extends ConsumerWidget {
     final currentUserMemberAsync = ref.watch(currentUserMemberProvider(orgId));
 
     return membersAsync.when(
-      loading: () => const AppLoader(message: 'Loading team members...'),
+      loading: () => AppLoader(message: 'Loading team members...'),
       error: (e, _) => ErrorView(
         message: e.toString(),
         onRetry: () => ref.invalidate(teamMembersProvider(teamId)),
@@ -157,10 +157,10 @@ class _MembersTab extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: context.colorSurface,
                 border: Border(
                   bottom: BorderSide(
-                    color: AppColors.border.withValues(alpha:0.5),
+                    color: context.colorBorder.withValues(alpha:0.5),
                   ),
                 ),
               ),
@@ -172,19 +172,19 @@ class _MembersTab extends ConsumerWidget {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha:0.15),
+                      color: context.colorPrimary.withValues(alpha:0.15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
                       '${members.length} ${members.length == 1 ? 'Member' : 'Members'}',
-                      style: const TextStyle(
-                        color: AppColors.primary,
+                      style: TextStyle(
+                        color: context.colorPrimary,
                         fontWeight: FontWeight.w600,
                         fontSize: 13,
                       ),
                     ),
                   ),
-                  const Spacer(),
+                  Spacer(),
                   if (canManage)
                     ElevatedButton.icon(
                       onPressed: () {
@@ -198,14 +198,14 @@ class _MembersTab extends ConsumerWidget {
                           ),
                         );
                       },
-                      icon: const Icon(Icons.person_add_alt_1_rounded, size: 18),
-                      label: const Text(
+                      icon: Icon(Icons.person_add_alt_1_rounded, size: 18),
+                      label: Text(
                         'Add Member',
                         style: TextStyle(fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.onPrimary,
+                        backgroundColor: context.colorPrimary,
+                        foregroundColor: context.colorOnPrimary,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 10,
@@ -228,7 +228,7 @@ class _MembersTab extends ConsumerWidget {
                 child: ListView.separated(
                   padding: const EdgeInsets.all(16),
                   itemCount: members.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => SizedBox(height: 10),
                   itemBuilder: (context, i) {
                     final m = members[i];
                     final name = m.fullName?.isNotEmpty == true
@@ -238,16 +238,16 @@ class _MembersTab extends ConsumerWidget {
                     return Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.surface,
+                        color: context.colorSurface,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                          color: AppColors.border.withValues(alpha:0.5),
+                          color: context.colorBorder.withValues(alpha:0.5),
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha:0.04),
                             blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            offset: Offset(0, 2),
                           ),
                         ],
                       ),
@@ -257,20 +257,20 @@ class _MembersTab extends ConsumerWidget {
                             avatarUrl: m.avatarUrl,
                             name: name,
                           ),
-                          const SizedBox(width: 14),
+                          SizedBox(width: 14),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: AppColors.textPrimary,
+                                    color: context.colorTextPrimary,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Container(
@@ -279,25 +279,25 @@ class _MembersTab extends ConsumerWidget {
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.secondary
+                                        color: context.colorSecondary
                                             .withValues(alpha:0.15),
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         'TEAM MEMBER',
                                         style: TextStyle(
-                                          color: AppColors.secondary,
+                                          color: context.colorSecondary,
                                           fontSize: 10,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 0.5,
                                         ),
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
+                                    SizedBox(width: 8),
                                     Text(
                                       'Joined ${_formatDate(m.joinedAt)}',
-                                      style: const TextStyle(
-                                        color: AppColors.textMuted,
+                                      style: TextStyle(
+                                        color: context.colorTextMuted,
                                         fontSize: 12,
                                       ),
                                     ),
@@ -308,9 +308,9 @@ class _MembersTab extends ConsumerWidget {
                           ),
                           if (canManage)
                             IconButton(
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.remove_circle_outline_rounded,
-                                color: AppColors.error,
+                                color: context.colorError,
                               ),
                               tooltip: 'Remove from team',
                               onPressed: () => _confirmRemove(context, ref, m.id, name),
@@ -341,25 +341,25 @@ class _MembersTab extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: context.colorSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Remove from Team?',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.colorTextPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),
         content: Text(
           'Are you sure you want to remove $name from this team? They will no longer see tasks or chat in this team.',
-          style: const TextStyle(color: AppColors.textSecondary),
+          style: TextStyle(color: context.colorTextSecondary),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text(
+            child: Text(
               'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+              style: TextStyle(color: context.colorTextSecondary),
             ),
           ),
           ElevatedButton(
@@ -368,10 +368,10 @@ class _MembersTab extends ConsumerWidget {
               ref.read(teamMembersProvider(teamId).notifier).removeMember(memberId);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: AppColors.onPrimary,
+              backgroundColor: context.colorError,
+              foregroundColor: context.colorOnPrimary,
             ),
-            child: const Text('Remove'),
+            child: Text('Remove'),
           ),
         ],
       ),
@@ -410,7 +410,7 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
             _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
+            duration: Duration(milliseconds: 300),
             curve: Curves.easeOut,
           );
         }
@@ -435,28 +435,28 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
       children: [
         Expanded(
           child: messagesAsync.when(
-            loading: () => const AppLoader(message: 'Loading messages...'),
+            loading: () => AppLoader(message: 'Loading messages...'),
             error: (e, _) => Center(
               child: Text(
                 'Error loading chat: $e',
-                style: const TextStyle(color: AppColors.error),
+                style: TextStyle(color: context.colorError),
               ),
             ),
             data: (messages) => messages.isEmpty
-                ? const Center(
+                ? Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                           Icons.chat_bubble_outline_rounded,
                           size: 54,
-                          color: AppColors.textMuted,
+                          color: context.colorTextMuted,
                         ),
                         SizedBox(height: 12),
                         Text(
                           'No team messages yet',
                           style: TextStyle(
-                            color: AppColors.textPrimary,
+                            color: context.colorTextPrimary,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
@@ -465,7 +465,7 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
                         Text(
                           'Start a discussion with your team members!',
                           style: TextStyle(
-                            color: AppColors.textSecondary,
+                            color: context.colorTextSecondary,
                             fontSize: 13,
                           ),
                         ),
@@ -494,10 +494,10 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
         Container(
           padding: const EdgeInsets.fromLTRB(16, 10, 16, 16),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: context.colorSurface,
             border: Border(
               top: BorderSide(
-                color: AppColors.border.withValues(alpha:0.5),
+                color: context.colorBorder.withValues(alpha:0.5),
               ),
             ),
           ),
@@ -507,23 +507,23 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
                 Expanded(
                   child: TextField(
                     controller: _ctrl,
-                    style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
+                    style: TextStyle(color: context.colorTextPrimary, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Type a message to team...',
-                      hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 14),
+                      hintStyle: TextStyle(color: context.colorTextMuted, fontSize: 14),
                       filled: true,
-                      fillColor: AppColors.background,
+                      fillColor: context.colorBackground,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        borderSide: BorderSide(color: context.colorBorder),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        borderSide: BorderSide(color: context.colorBorder),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20),
-                        borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                        borderSide: BorderSide(color: context.colorPrimary, width: 1.5),
                       ),
                       contentPadding: const EdgeInsets.symmetric(
                         horizontal: 18,
@@ -535,16 +535,16 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
                     textInputAction: TextInputAction.send,
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 IconButton.filled(
                   onPressed: _sending ? null : _send,
                   style: IconButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.onPrimary,
+                    backgroundColor: context.colorPrimary,
+                    foregroundColor: context.colorOnPrimary,
                     padding: const EdgeInsets.all(12),
                   ),
                   icon: _sending
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 18,
                           height: 18,
                           child: CircularProgressIndicator(
@@ -552,7 +552,7 @@ class _ChatTabState extends ConsumerState<_ChatTab> {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.send_rounded, size: 20),
+                      : Icon(Icons.send_rounded, size: 20),
                 ),
               ],
             ),
