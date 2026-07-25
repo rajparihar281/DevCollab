@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:dev_collab/shared/themes/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     setState(() => _isLoading = true);
 
     try {
-      log('[ResetPasswordPage] Updating user password securely...');
+
       await Supabase.instance.client.auth.updateUser(
         UserAttributes(password: newPassword),
       );
@@ -46,7 +45,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 Icon(Icons.check_circle_outline, color: Colors.white),
@@ -59,23 +58,23 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                 ),
               ],
             ),
-            backgroundColor: AppColors.success,
+            backgroundColor: context.colorSuccess,
             behavior: SnackBarBehavior.floating,
           ),
         );
         context.go(RouteNames.login);
       }
     } catch (e) {
-      log('[ResetPasswordPage] Error updating password: $e');
+
       setState(() => _isLoading = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               'Password reset failed: $e',
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
-            backgroundColor: AppColors.error,
+            backgroundColor: context.colorError,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -89,7 +88,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Set New Password'),
+        title: Text('Set New Password'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -99,7 +98,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -112,14 +111,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     color: theme.colorScheme.primary,
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 Text(
                   'Create New Password',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8),
                 Text(
                   'Enter your new strong password below to secure your DevCollab account.',
                   style: theme.textTheme.bodyMedium?.copyWith(
@@ -128,14 +127,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     height: 1.5,
                   ),
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 TextFormField(
                   controller: _newPasswordController,
                   obscureText: _obscureNew,
                   decoration: InputDecoration(
                     labelText: 'New Password',
                     hintText: 'At least 6 characters',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureNew
@@ -155,14 +154,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: _obscureConfirm,
                   decoration: InputDecoration(
                     labelText: 'Confirm New Password',
                     hintText: 'Re-enter your new password',
-                    prefixIcon: const Icon(Icons.lock_outline_rounded),
+                    prefixIcon: Icon(Icons.lock_outline_rounded),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _obscureConfirm
@@ -183,14 +182,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 32),
+                SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _isLoading ? _updatePassword : _updatePassword,
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(52),
                   ),
                   child: _isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
@@ -198,7 +197,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Update Password'),
+                      : Text('Update Password'),
                 ),
               ],
             ),
