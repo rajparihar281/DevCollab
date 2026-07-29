@@ -62,27 +62,33 @@ class PriorityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOutCubic,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: priority.color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: priority.color.withValues(alpha: 0.4)),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(priority.icon, size: 12, color: priority.color),
-          const SizedBox(width: 4),
-          Text(
-            priority.label,
-            style: TextStyle(
-              color: priority.color,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: Row(
+          key: ValueKey(priority),
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(priority.icon, size: 12, color: priority.color),
+            const SizedBox(width: 4),
+            Text(
+              priority.label,
+              style: TextStyle(
+                color: priority.color,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
