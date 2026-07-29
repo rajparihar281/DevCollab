@@ -62,19 +62,25 @@ class StatusChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: status.color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: status.color.withValues(alpha: 0.3)),
       ),
-      child: Text(
-        status.label,
-        style: TextStyle(
-          color: status.color,
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: Text(
+          status.label,
+          key: ValueKey(status.label),
+          style: TextStyle(
+            color: status.color,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+          ),
         ),
       ),
     );
